@@ -16,6 +16,12 @@ export const auth = {
     },
     getRole: (): 'admin' | 'renter' | null => {
         const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data).role : null;
+        if (!data) return null;
+        try {
+            const parsed = JSON.parse(data) as any;
+            return (parsed.role as 'admin' | 'renter') ?? null;
+        } catch {
+            return null;
+        }
     }
 };

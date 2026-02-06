@@ -49,14 +49,15 @@ export function DatePicker({ date, setDate, label, placeholder = "Select date", 
                             {open && (
                                 <PopoverPanel
                                     static
-                                    as={motion.div}
-                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                    transition={{ duration: 0.2, ease: "easeOut" }}
                                     className="absolute z-[60] mt-3 left-0 sm:left-auto sm:right-0"
                                 >
-                                    <Calendar
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        transition={{ duration: 0.2, ease: "easeOut" }}
+                                    >
+                                        <Calendar
                                         mode="single"
                                         selected={date}
                                         onSelect={(newDate) => {
@@ -66,6 +67,7 @@ export function DatePicker({ date, setDate, label, placeholder = "Select date", 
                                         disabled={disabled}
                                         initialFocus
                                     />
+                                    </motion.div>
                                 </PopoverPanel>
                             )}
                         </AnimatePresence>

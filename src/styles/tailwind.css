@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,300,400&f[]=general-sans@500,300,600,400,700&display=swap');
+
+
+@theme {
+  --color-primary: #1E293B;
+  --color-secondary: #334155;
+  --color-cta: #DC2626;
+  --color-background: #F8FAFC;
+  --color-text: #0F172A;
+
+  --font-heading: 'Satoshi', 'DM Sans', sans-serif;
+  --font-body: 'General Sans', 'DM Sans', sans-serif;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-body);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer components {
+  /* Primary Button */
+  .btn-primary {
+    @apply bg-[var(--color-cta)] text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 cursor-pointer;
+  }
+  .btn-primary:hover {
+    @apply opacity-90 -translate-y-[1px];
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    @apply bg-transparent text-[var(--color-primary)] border-2 border-[var(--color-primary)] px-6 py-3 rounded-lg font-semibold transition-all duration-200 cursor-pointer;
+  }
+  
+  /* Card */
+  .card {
+    @apply bg-[#F8FAFC] rounded-xl p-6 shadow-[var(--shadow-md)] transition-all duration-200 cursor-pointer;
+  }
+  .card:hover {
+    @apply shadow-[var(--shadow-lg)] -translate-y-0.5;
+  }
+}
+

@@ -2,32 +2,47 @@ import { motion } from "framer-motion";
 import {
     TrendingUp,
     Users,
-    Car,
-    Calendar,
     ArrowUpRight,
     ArrowDownRight,
-    MoreHorizontal,
     CheckCircle2,
-    Clock,
-    AlertCircle,
-    Search,
+    Activity,
+    DollarSign,
     Filter
 } from "lucide-react";
 import { cn } from "../../../common/utils";
+import { ResponsiveLine } from "@nivo/line";
+import { ResponsivePie } from "@nivo/pie";
+import { ReactNode } from "react";
 
-// Mock Data
-const stats = [
-    { title: "Total Revenue", value: "$124,592", change: "+12.5%", trend: "up", icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { title: "Active Rentals", value: "45", change: "+4", trend: "up", icon: Car, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { title: "Pending Bookings", value: "12", change: "-2", trend: "down", icon: Calendar, color: "text-amber-500", bg: "bg-amber-500/10" },
-    { title: "New Customers", value: "28", change: "+14.2%", trend: "up", icon: Users, color: "text-purple-500", bg: "bg-purple-500/10" },
+// Mock Data for Nivo Line Chart
+const revenueData = [
+    {
+        id: "Revenue",
+        color: "hsl(348, 70%, 50%)",
+        data: [
+            { x: "Mon", y: 1200 },
+            { x: "Tue", y: 2100 },
+            { x: "Wed", y: 1800 },
+            { x: "Thu", y: 3500 },
+            { x: "Fri", y: 2800 },
+            { x: "Sat", y: 4200 },
+            { x: "Sun", y: 3800 },
+        ]
+    }
 ];
 
-const cars = [
-    { name: "Porsche 911 GT3 RS", plate: "CA 8829X", status: "Active", image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1600&auto=format&fit=crop" },
-    { name: "Mercedes-AMG GT", plate: "NY 2210Z", status: "Available", image: "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&auto=format&fit=crop&q=60" },
-    { name: "Tesla Model S Plaid", plate: "TX 4492A", status: "Maintenance", image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&auto=format&fit=crop&q=60" },
-    { name: "BMW M4 Competition", plate: "FL 9921K", status: "Available", image: "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?w=800&auto=format&fit=crop&q=60" },
+// Mock Data for Nivo Pie Chart
+const fleetStatusData = [
+    { id: "Active", label: "Active", value: 45, color: "hsl(142, 70%, 50%)" },
+    { id: "Available", label: "Available", value: 30, color: "hsl(217, 91%, 60%)" },
+    { id: "Maintenance", label: "Maintenance", value: 15, color: "hsl(38, 92%, 50%)" },
+];
+
+const stats = [
+    { title: "Total Revenue", value: "$124,592", change: "+12.5%", trend: "up", icon: DollarSign, color: "text-red-500", bg: "bg-red-500/10" },
+    { title: "Active Rentals", value: "45", change: "+4", trend: "up", icon: Activity, color: "text-blue-500", bg: "bg-blue-500/10" },
+    { title: "Fleet Health", value: "98.2%", change: "+0.5%", trend: "up", icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+    { title: "New Customers", value: "28", change: "+14.2%", trend: "up", icon: Users, color: "text-purple-500", bg: "bg-purple-500/10" },
 ];
 
 const bookings = [
@@ -35,168 +50,236 @@ const bookings = [
     { id: "#ORD-9921", customer: "Sarah Connor", car: "Mercedes-AMG GT", dates: "Feb 14 - Feb 18", amount: "$2,450", status: "Pending" },
     { id: "#ORD-8823", customer: "Tony Stark", car: "Tesla Model S Plaid", dates: "Now - Feb 05", amount: "$1,200", status: "Active" },
     { id: "#ORD-1122", customer: "Bruce Wayne", car: "BMW M4 Comp", dates: "Feb 20 - Feb 22", amount: "$950", status: "Cancelled" },
-    { id: "#ORD-3344", customer: "Ellen Ripley", car: "Range Rover Sport", dates: "Mar 01 - Mar 05", amount: "$1,500", status: "Confirmed" },
+    { id: "#ORD-2233", customer: "Ellen Ripley", car: "Ford Mustang GT", dates: "Feb 25 - Feb 28", amount: "$750", status: "Confirmed" },
 ];
+
+const GlassCard = ({ children, className, delay = 0 }: { children: ReactNode, className?: string, delay?: number }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay, duration: 0.5 }}
+        className={cn(
+            "bg-white/70 dark:bg-slate-900/40 backdrop-blur-xl border border-white/20 dark:border-slate-800/50 rounded-3xl shadow-xl overflow-hidden",
+            className
+        )}
+    >
+        {children}
+    </motion.div>
+);
 
 export const PortalDashboard = () => {
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-8 font-sans transition-colors duration-500">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white font-heading">Dashboard Overview</h1>
-                    <p className="text-slate-500 dark:text-slate-400">Welcome back, here's what's happening today.</p>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white font-heading tracking-tight">Fleet Analytics</h1>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium">Real-time performance monitoring and fleet management.</p>
                 </div>
                 <div className="flex gap-3">
-                    <button className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                    <button className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all font-semibold shadow-sm cursor-pointer">
                         <Filter size={18} />
-                        Filter
+                        Filter Events
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors font-medium shadow-sm">
-                        <ArrowDownRight size={18} />
-                        Export Report
+                    <button className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white rounded-2xl hover:bg-red-700 transition-all font-bold shadow-lg shadow-red-500/20 cursor-pointer">
+                        <Activity size={18} />
+                        Live Reports
                     </button>
                 </div>
             </div>
 
-            {/* KPI Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, index) => (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        key={stat.title}
-                        className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow group"
-                    >
-                        <div className="flex justify-between items-start mb-4">
-                            <div className={cn("p-3 rounded-xl", stat.bg, stat.color)}>
-                                <stat.icon size={22} />
+            {/* Optimized Bento Grid Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                {/* Row 1: KPI Stats (Full Width on Desktop) */}
+                {stats.map((stat, i) => (
+                    <GlassCard key={stat.title} delay={i * 0.1} className="p-6 group cursor-pointer hover:border-red-500/30 transition-all duration-300">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className={cn("p-3 rounded-2xl", stat.bg, stat.color)}>
+                                <stat.icon size={24} />
                             </div>
                             <span className={cn(
-                                "flex items-center text-xs font-bold px-2 py-1 rounded-full",
+                                "flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest",
                                 stat.trend === "up" ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-red-600 bg-red-50 dark:bg-red-500/10 dark:text-red-400"
                             )}>
-                                {stat.change} {stat.trend === "up" ? <ArrowUpRight size={14} className="ml-1" /> : <ArrowDownRight size={14} className="ml-1" />}
+                                {stat.change}
+                                {stat.trend === "up" ? <ArrowUpRight size={10} className="ml-1" /> : <ArrowDownRight size={10} className="ml-1" />}
                             </span>
                         </div>
-                        <h3 className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">{stat.title}</h3>
-                        <p className="text-2xl font-bold text-slate-900 dark:text-white font-heading">{stat.value}</p>
-                    </motion.div>
+                        <h3 className="text-slate-500 dark:text-slate-400 text-sm font-bold uppercase tracking-wider mb-1">{stat.title}</h3>
+                        <p className="text-3xl font-bold text-slate-900 dark:text-white font-heading">{stat.value}</p>
+                    </GlassCard>
                 ))}
-            </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                {/* Bookings List (2/3 width) */}
-                <div className="xl:col-span-2 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-slate-900 dark:text-white font-heading">Recent Bookings</h2>
-                        <div className="relative">
-                            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                            <input
-                                type="text"
-                                placeholder="Search order ID..."
-                                className="pl-9 pr-4 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-slate-500 outline-none w-48 transition-all"
-                            />
+                {/* Row 2: Analytics Row */}
+                {/* Revenue Chart - 3/4 Span */}
+                <GlassCard className="md:col-span-2 lg:col-span-3 h-[400px] p-6 lg:p-8 flex flex-col">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white font-heading">Revenue Trends</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Weekly financial performance overview</p>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full">
+                            <TrendingUp size={14} />
+                            <span className="text-xs font-bold">+24%</span>
                         </div>
                     </div>
-
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                        <table className="w-full text-left">
-                            <thead className="bg-slate-50 dark:bg-slate-950/50 border-b border-slate-200 dark:border-slate-800">
-                                <tr>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Order ID</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Customer</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:table-cell">Car</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:table-cell">Status</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Amount</th>
-                                    <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider"></th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                                {bookings.map((booking) => (
-                                    <tr key={booking.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                                        <td className="px-6 py-4 text-sm font-bold text-slate-900 dark:text-white font-mono">{booking.id}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-400">
-                                                    {booking.customer.charAt(0)}
-                                                </div>
-                                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{booking.customer}</span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 hidden sm:table-cell text-sm text-slate-600 dark:text-slate-400">{booking.car}</td>
-                                        <td className="px-6 py-4 hidden md:table-cell">
-                                            <span className={cn(
-                                                "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border",
-                                                booking.status === "Confirmed" && "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
-                                                booking.status === "Pending" && "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20",
-                                                booking.status === "Active" && "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20",
-                                                booking.status === "Cancelled" && "bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20",
-                                            )}>
-                                                {booking.status === "Confirmed" && <CheckCircle2 size={12} />}
-                                                {booking.status === "Pending" && <AlertCircle size={12} />}
-                                                {booking.status === "Active" && <Clock size={12} />}
-                                                {booking.status}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right text-sm font-bold text-slate-900 dark:text-white">{booking.amount}</td>
-                                        <td className="px-6 py-4 text-right">
-                                            <button className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
-                                                <MoreHorizontal size={18} />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                    <div className="flex-1 min-h-0">
+                        <ResponsiveLine
+                            data={revenueData}
+                            margin={{ top: 20, right: 20, bottom: 50, left: 50 }}
+                            xScale={{ type: 'point' }}
+                            yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false }}
+                            curve="monotoneX"
+                            axisTop={null}
+                            axisRight={null}
+                            axisBottom={{
+                                tickSize: 5,
+                                tickPadding: 5,
+                                tickRotation: 0,
+                                legend: 'Days of Week',
+                                legendOffset: 36,
+                                legendPosition: 'middle'
+                            }}
+                            axisLeft={{
+                                tickSize: 5,
+                                tickPadding: 5,
+                                tickRotation: 0,
+                                legend: 'Revenue ($)',
+                                legendOffset: -40,
+                                legendPosition: 'middle'
+                            }}
+                            colors={{ scheme: 'set1' }}
+                            pointSize={10}
+                            pointColor={{ theme: 'background' }}
+                            pointBorderWidth={2}
+                            pointBorderColor={{ from: 'serieColor' }}
+                            pointLabelYOffset={-12}
+                            enableArea={true}
+                            areaOpacity={0.15}
+                            useMesh={true}
+                            theme={{
+                                axis: {
+                                    ticks: { text: { fill: "currentColor", opacity: 0.5, fontSize: 10 } },
+                                    legend: { text: { fill: "currentColor", opacity: 0.7, fontSize: 12, fontWeight: 'bold' } }
+                                },
+                                grid: { line: { stroke: "currentColor", opacity: 0.1 } },
+                                tooltip: {
+                                    container: {
+                                        background: '#1e293b',
+                                        color: '#ffffff',
+                                        fontSize: 12,
+                                        borderRadius: 8,
+                                    },
+                                },
+                            }}
+                        />
                     </div>
-                </div>
+                </GlassCard>
 
-                {/* Fleet Overview (1/3 width) */}
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-slate-900 dark:text-white font-heading">Live Fleet Status</h2>
-                        <a href="#" className="text-xs font-semibold text-red-600 hover:text-red-700 dark:text-red-400">View All</a>
+                {/* Fleet Distribution - 1/4 Span */}
+                <GlassCard className="h-[400px] p-6 lg:p-8 flex flex-col md:col-span-2 lg:col-span-1">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white font-heading mb-4">Fleet Status</h3>
+                    <div className="flex-1 min-h-0">
+                        <ResponsivePie
+                            data={fleetStatusData}
+                            margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
+                            innerRadius={0.6}
+                            padAngle={2}
+                            cornerRadius={8}
+                            activeOuterRadiusOffset={8}
+                            borderWidth={1}
+                            borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+                            enableArcLabels={false}
+                            enableArcLinkLabels={true}
+                            arcLinkLabelsSkipAngle={10}
+                            arcLinkLabelsTextColor="currentColor"
+                            arcLinkLabelsThickness={2}
+                            arcLinkLabelsColor={{ from: 'color' }}
+                            colors={{ datum: 'data.color' }}
+                            theme={{
+                                tooltip: {
+                                    container: {
+                                        background: '#1e293b',
+                                        color: '#ffffff',
+                                        fontSize: 12,
+                                        borderRadius: 8,
+                                    },
+                                },
+                                labels: { text: { fontSize: 11, fontWeight: 'bold' } }
+                            }}
+                            legends={[
+                                {
+                                    anchor: 'bottom',
+                                    direction: 'row',
+                                    justify: false,
+                                    translateX: 0,
+                                    translateY: 30,
+                                    itemsSpacing: 0,
+                                    itemWidth: 70,
+                                    itemHeight: 18,
+                                    itemTextColor: 'currentColor',
+                                    itemDirection: 'left-to-right',
+                                    itemOpacity: 0.6,
+                                    symbolSize: 10,
+                                    symbolShape: 'circle'
+                                }
+                            ]}
+                        />
+                    </div>
+                </GlassCard>
+
+                {/* Row 3: Operations Table (Expanded Full Width) */}
+                <GlassCard className="lg:col-span-4 p-8 flex flex-col">
+                    <div className="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white font-heading tracking-tight">Recent Operations</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Activity and transaction log for the last 24 hours.</p>
+                        </div>
+                        <button className="px-5 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold rounded-xl uppercase tracking-widest hover:opacity-90 transition-all">Global Log</button>
                     </div>
 
-                    <div className="space-y-4">
-                        {cars.map((car) => (
-                            <div key={car.plate} className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-red-500/30 transition-all group flex gap-4">
-                                <div className="w-24 h-24 sm:w-32 bg-slate-100 dark:bg-slate-950 rounded-lg overflow-hidden flex-shrink-0">
-                                    <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+                        {bookings.map((booking) => (
+                            <div key={booking.id} className="flex flex-col gap-4 p-5 rounded-3xl bg-slate-50/50 dark:bg-slate-950/20 border border-slate-100/50 dark:border-slate-800/30 hover:border-red-500/30 transition-all group relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <Activity size={40} />
                                 </div>
-                                <div className="flex-1 flex flex-col justify-center">
-                                    <h4 className="font-bold text-slate-900 dark:text-white text-sm mb-1 line-clamp-1">{car.name}</h4>
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <span className="text-xs text-slate-500 font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{car.plate}</span>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-2xl bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-white shadow-lg">
+                                        {booking.customer.charAt(0)}
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className={cn(
-                                            "text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border",
-                                            car.status === "Active" && "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20",
-                                            car.status === "Available" && "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
-                                            car.status === "Maintenance" && "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20",
-                                        )}>
-                                            {car.status}
-                                        </span>
-                                        <button className="text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-red-500 transition-colors">
-                                            Manage
-                                        </button>
+                                    <div className="min-w-0">
+                                        <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{booking.customer}</p>
+                                        <p className="font-mono text-[10px] text-slate-500 tracking-tighter">{booking.id}</p>
                                     </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest text-[8px]">Vehicle</p>
+                                    <p className="text-xs text-slate-700 dark:text-slate-300 font-medium line-clamp-1">{booking.car}</p>
+                                </div>
+
+                                <div className="pt-2 mt-auto flex items-center justify-between border-t border-slate-100 dark:border-slate-800/50">
+                                    <span className={cn(
+                                        "text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full border",
+                                        booking.status === "Confirmed" && "text-emerald-500 border-emerald-500/20 bg-emerald-500/5",
+                                        booking.status === "Pending" && "text-amber-500 border-amber-500/20 bg-amber-500/5",
+                                        booking.status === "Active" && "text-blue-500 border-blue-500/20 bg-blue-500/5",
+                                        booking.status === "Cancelled" && "text-red-500 border-red-500/20 bg-red-500/5",
+                                    )}>{booking.status}</span>
+                                    <p className="font-bold text-sm text-slate-900 dark:text-white">{booking.amount}</p>
                                 </div>
                             </div>
                         ))}
 
-                        {/* Quick Add Card */}
-                        <button className="w-full border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700 transition-all gap-2 h-24">
-                            <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                                <Car size={16} />
-                            </div>
-                            <span className="text-xs font-bold">Add New Vehicle</span>
-                        </button>
+                        {/* Summary View Mock Link */}
+                        <div className="flex flex-col items-center justify-center p-5 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 text-slate-400 hover:text-red-500 hover:border-red-500/50 transition-all cursor-pointer group">
+                            <TrendingUp size={24} className="mb-2 group-hover:scale-110 transition-transform" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Analytics</span>
+                        </div>
                     </div>
-                </div>
+                </GlassCard>
             </div>
         </div>
     );

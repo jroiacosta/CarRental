@@ -76,7 +76,7 @@ export default function RenterDashboard() {
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 {/* Main Content Column (2/3) */}
-                <div className="xl:col-span-2 space-y-8">
+                <div className="xl:col-span-2 space-y-16">
 
                     {/* Active Rental Hero Card */}
                     <section>
@@ -123,7 +123,7 @@ export default function RenterDashboard() {
                                 { title: "Manage Bookings", icon: Package, color: "red", to: "/renter/bookings", desc: "View history & upcoming trips" },
                                 { title: "My Profile", icon: User, color: "blue", to: "/renter/profile", desc: "Edit personal details" },
                                 { title: "Saved Addresses", icon: MapPin, color: "emerald", to: "/renter/profile", desc: "Manage billing locations" },
-                                { title: "Payment Methods", icon: CreditCard, color: "purple", to: "/renter/settings", desc: "Update cards & billing" },
+                                { title: "Payment Methods", icon: CreditCard, color: "purple", to: "/renter/profile", desc: "Update cards & billing" },
                             ].map((item) => (
                                 <Link
                                     key={item.title}

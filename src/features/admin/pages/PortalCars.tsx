@@ -1,7 +1,24 @@
-import { Plus, Filter, Fuel, Gauge, Zap, Edit, Trash2 } from "lucide-react";
+import { Plus, Filter, Fuel, Gauge, Zap, Edit, Trash2, ArrowUpRight } from "lucide-react";
+import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { cn } from "../../../common/utils";
+import { AddCarModal } from "../components/AddCarModal";
 
-const cars = [
+export interface Car {
+    id: number;
+    name: string;
+    plate: string;
+    status: string;
+    image: string;
+    category: string;
+    price: number;
+    fuel: string;
+    speed: string;
+    featured?: boolean;
+    gallery?: string[];
+}
+
+const initialCars: Car[] = [
     {
         id: 1,
         name: "Porsche 911 GT3 RS",
@@ -60,6 +77,47 @@ const cars = [
 ];
 
 export const PortalCars = () => {
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [cars, setCars] = useState<Car[]>(initialCars);
+    const [editingCar, setEditingCar] = useState<Car | null>(null);
+
+    const handleEdit = (car: Car) => {
+        setEditingCar(car);
+        setIsAddModalOpen(true);
+    };
+
+    const handleDelete = (id: number) => {
+        setCars(prev => prev.filter(c => c.id !== id));
+    };
+
+    const handleSave = (carData: Partial<Car>) => {
+        if (editingCar) {
+            // Update existing
+            setCars(prev => prev.map(c => c.id === editingCar.id ? { ...c, ...carData } : c));
+        } else {
+            // Add new
+            const newCar: Car = {
+                id: Math.max(...cars.map(c => c.id)) + 1,
+                name: carData.name || "New Car",
+                plate: "NEW 0000",
+                status: "Available", // Default
+                image: carData.image || "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=800", // Fallback or placeholder
+                category: carData.category || "Luxury",
+                price: carData.price || 0,
+                fuel: "Premium", // Default
+                speed: "150 mph", // Default
+                featured: carData.featured,
+                gallery: carData.gallery
+            };
+            setCars(prev => [newCar, ...prev]);
+        }
+    };
+
+    const handleClose = () => {
+        setIsAddModalOpen(false);
+        setEditingCar(null);
+    };
+
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
@@ -73,20 +131,39 @@ export const PortalCars = () => {
                         <Filter size={18} />
                         Filter
                     </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-lg shadow-red-900/20">
+                    <button
+                        onClick={() => setIsAddModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium shadow-lg shadow-red-900/20"
+                    >
                         <Plus size={18} />
                         Add Vehicle
                     </button>
                 </div>
             </div>
 
+            <AddCarModal
+                isOpen={isAddModalOpen}
+                onClose={handleClose}
+                onSave={handleSave}
+                initialData={editingCar || undefined}
+            />
+
             {/* Content */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {cars.map((car) => (
-                    <div key={car.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                        <div className="relative h-48 overflow-hidden">
+                    <div key={car.id} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col">
+                        <Link
+                            to="/portal/cars/$carId"
+                            params={{ carId: car.id.toString() }}
+                            className="relative h-48 overflow-hidden block"
+                        >
                             <img src={car.image} alt={car.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                            <div className="absolute top-4 right-4">
+                            <div className="absolute top-4 right-4 flex gap-2">
+                                {car.featured && (
+                                    <span className="px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md border shadow-sm bg-yellow-500/80 text-white border-white/20">
+                                        Featured
+                                    </span>
+                                )}
                                 <span className={cn(
                                     "px-3 py-1 rounded-full text-xs font-bold backdrop-blur-md border shadow-sm",
                                     car.status === "Active" && "bg-blue-500/80 text-white border-white/20",
@@ -100,7 +177,12 @@ export const PortalCars = () => {
                                 <p className="text-white font-bold font-heading text-lg">{car.name}</p>
                                 <p className="text-slate-300 text-xs font-mono">{car.plate}</p>
                             </div>
-                        </div>
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <span className="bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-full border border-white/20 font-bold text-sm flex items-center gap-2">
+                                    View Specifications <ArrowUpRight size={16} />
+                                </span>
+                            </div>
+                        </Link>
 
                         <div className="p-5 space-y-4">
                             <div className="grid grid-cols-3 gap-2 py-2 border-b border-slate-100 dark:border-slate-800">
@@ -124,10 +206,16 @@ export const PortalCars = () => {
                                     <p className="text-xs text-slate-500">per day</p>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
+                                    <button
+                                        onClick={() => handleEdit(car)}
+                                        className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                    >
                                         <Edit size={18} />
                                     </button>
-                                    <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                    <button
+                                        onClick={() => handleDelete(car.id)}
+                                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                    >
                                         <Trash2 size={18} />
                                     </button>
                                 </div>

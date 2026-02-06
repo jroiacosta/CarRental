@@ -1,7 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { PortalBookings } from '../features/admin/pages/PortalBookings'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/portal/bookings')({
-    component: PortalBookings,
+    component: () => <Outlet />,
 })
-

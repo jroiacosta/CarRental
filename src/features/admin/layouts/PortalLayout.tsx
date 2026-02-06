@@ -50,9 +50,37 @@ const SidebarItem = ({
 
 export const PortalLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
     const { theme, toggleTheme } = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
+
+    const notifications = [
+        {
+            id: 1,
+            type: 'booking',
+            title: 'New Booking',
+            message: 'John Wick booked Porsche 911 GT3 RS for 2 days.',
+            time: '5 mins ago',
+            isRead: false
+        },
+        {
+            id: 2,
+            type: 'rental_end',
+            title: 'Rental Nearing End',
+            message: "Sarah Connor's rental for Mercedes-AMG GT ends in 1 hour.",
+            time: '25 mins ago',
+            isRead: false
+        },
+        {
+            id: 3,
+            type: 'report',
+            title: 'Issue Reported',
+            message: 'Bruce Wayne reported a flat tire on Tesla Model S Plaid.',
+            time: '1 hour ago',
+            isRead: true
+        }
+    ];
 
     const handleLogout = () => {
         auth.logout();
@@ -182,10 +210,76 @@ export const PortalLayout = () => {
                             {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                         </button>
 
-                        <button className="relative p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 rounded-lg">
-                            <Bell size={20} />
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-slate-900" />
-                        </button>
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowNotifications(!showNotifications)}
+                                className={cn(
+                                    "relative p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 rounded-lg transition-colors",
+                                    showNotifications && "bg-slate-100 dark:bg-slate-800 text-red-500"
+                                )}
+                            >
+                                <Bell size={20} />
+                                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-slate-900" />
+                            </button>
+
+                            {/* Notifications Dropdown */}
+                            {showNotifications && (
+                                <>
+                                    <div
+                                        className="fixed inset-0 z-40"
+                                        onClick={() => setShowNotifications(false)}
+                                    />
+                                    <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+                                        <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/20">
+                                            <h3 className="font-bold text-slate-900 dark:text-white">Notifications</h3>
+                                            <button className="text-[10px] font-bold text-red-500 uppercase tracking-widest hover:text-red-400 transition-colors">
+                                                Mark all as read
+                                            </button>
+                                        </div>
+                                        <div className="max-h-[400px] overflow-y-auto">
+                                            {notifications.map((n) => (
+                                                <div
+                                                    key={n.id}
+                                                    className={cn(
+                                                        "p-4 border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group",
+                                                        !n.isRead && "bg-blue-50/30 dark:bg-blue-500/5"
+                                                    )}
+                                                >
+                                                    <div className="flex gap-3">
+                                                        <div className={cn(
+                                                            "w-10 h-10 rounded-full flex items-center justify-center shrink-0 border shadow-sm",
+                                                            n.type === 'booking' && "bg-blue-50 text-blue-500 border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20",
+                                                            n.type === 'rental_end' && "bg-amber-50 text-amber-500 border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20",
+                                                            n.type === 'report' && "bg-red-50 text-red-500 border-red-100 dark:bg-red-500/10 dark:border-red-500/20",
+                                                        )}>
+                                                            {n.type === 'booking' && <CalendarCheck size={18} />}
+                                                            {n.type === 'rental_end' && <Bell size={18} />}
+                                                            {n.type === 'report' && <Car size={18} />}
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center justify-between mb-1">
+                                                                <p className="font-bold text-sm text-slate-900 dark:text-white leading-tight">
+                                                                    {n.title}
+                                                                </p>
+                                                                <span className="text-[10px] text-slate-400 font-medium">{n.time}</span>
+                                                            </div>
+                                                            <p className="text-xs text-slate-600 dark:text-slate-400 leading-normal">
+                                                                {n.message}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="p-3 bg-slate-50 dark:bg-slate-950/20 border-t border-slate-100 dark:border-slate-800 text-center">
+                                            <button className="text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
+                                                View all notifications
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
 
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">

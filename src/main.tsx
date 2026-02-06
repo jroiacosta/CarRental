@@ -17,12 +17,19 @@ declare module "@tanstack/react-router" {
 	}
 }
 
+import { TachometerLoader } from "./components/ui/CarLoader";
+
 const rootElement = document.querySelector("#root") as Element;
 if (!rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement);
 	root.render(
 		<React.StrictMode>
-			<React.Suspense fallback="loading">
+			<React.Suspense fallback={
+				<div className="min-h-screen bg-slate-950 flex items-center justify-center flex-col gap-4">
+					<TachometerLoader size={64} />
+					<p className="text-slate-500 font-medium animate-pulse">Starting Engine...</p>
+				</div>
+			}>
 				<App router={router} />
 			</React.Suspense>
 		</React.StrictMode>

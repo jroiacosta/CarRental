@@ -35,11 +35,11 @@ function Calendar({
                 row: "flex w-full mt-2",
                 cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-slate-800/50 [&:has([aria-selected])]:bg-slate-800 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
                 day: cn(
-                    "h-9 w-9 p-0 font-normal aria-selected:opacity-100 text-slate-300 hover:bg-slate-800 rounded-md transition-colors"
+                    "h-9 w-9 p-0 font-normal aria-selected:opacity-100 text-slate-300 hover:bg-slate-800 rounded-md transition-colors cursor-pointer flex items-center justify-center"
                 ),
                 day_range_end: "day-range-end",
                 day_selected:
-                    "bg-red-600 text-white hover:bg-red-600 hover:text-white focus:bg-red-600 focus:text-white rounded-md",
+                    "bg-red-600 text-white hover:bg-red-700 hover:text-white focus:bg-red-700 focus:text-white rounded-md",
                 day_today: "bg-slate-800 text-white font-bold border border-red-500/50", // Highlight today more clearly
                 day_outside:
                     "day-outside text-slate-600 opacity-50 aria-selected:bg-slate-800/50 aria-selected:text-slate-500 aria-selected:opacity-30",

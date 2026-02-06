@@ -1,4 +1,5 @@
-import { Filter, MoreHorizontal, Mail, Phone, MapPin } from "lucide-react";
+import { Filter, Mail, Phone, MapPin } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 const customers = [
     {
@@ -120,9 +121,13 @@ export const PortalCustomers = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <button className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
-                                            <MoreHorizontal size={18} />
-                                        </button>
+                                        <Link
+                                            to="/portal/customers/$customerId"
+                                            params={{ customerId: customer.id.toString() }}
+                                            className="text-white hover:text-white transition-colors px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-700"
+                                        >
+                                            View Details
+                                        </Link>
                                     </td>
                                 </tr>
                             ))}

@@ -15,12 +15,20 @@ import { Route as RenterRouteImport } from './routes/renter'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RenterProfileRouteImport } from './routes/renter.profile'
 import { Route as RenterDashboardRouteImport } from './routes/renter.dashboard'
 import { Route as RenterBookingsRouteImport } from './routes/renter.bookings'
+import { Route as PortalSettingsRouteImport } from './routes/portal.settings'
 import { Route as PortalDashboardRouteImport } from './routes/portal.dashboard'
 import { Route as PortalCustomersRouteImport } from './routes/portal.customers'
 import { Route as PortalCarsRouteImport } from './routes/portal.cars'
 import { Route as PortalBookingsRouteImport } from './routes/portal.bookings'
+import { Route as PortalCustomersIndexRouteImport } from './routes/portal.customers.index'
+import { Route as PortalCarsIndexRouteImport } from './routes/portal.cars.index'
+import { Route as PortalBookingsIndexRouteImport } from './routes/portal.bookings.index'
+import { Route as PortalCustomersCustomerIdRouteImport } from './routes/portal.customers.$customerId'
+import { Route as PortalCarsCarIdRouteImport } from './routes/portal.cars.$carId'
+import { Route as PortalBookingsOrderIdRouteImport } from './routes/portal.bookings.$orderId'
 
 const CarsCarIdLazyRouteImport = createFileRoute('/cars/$carId')()
 
@@ -49,6 +57,11 @@ const CarsCarIdLazyRoute = CarsCarIdLazyRouteImport.update({
   path: '/cars/$carId',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/cars.$carId.lazy').then((d) => d.Route))
+const RenterProfileRoute = RenterProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => RenterRoute,
+} as any)
 const RenterDashboardRoute = RenterDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -58,6 +71,11 @@ const RenterBookingsRoute = RenterBookingsRouteImport.update({
   id: '/bookings',
   path: '/bookings',
   getParentRoute: () => RenterRoute,
+} as any)
+const PortalSettingsRoute = PortalSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => PortalRoute,
 } as any)
 const PortalDashboardRoute = PortalDashboardRouteImport.update({
   id: '/dashboard',
@@ -79,32 +97,76 @@ const PortalBookingsRoute = PortalBookingsRouteImport.update({
   path: '/bookings',
   getParentRoute: () => PortalRoute,
 } as any)
+const PortalCustomersIndexRoute = PortalCustomersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalCustomersRoute,
+} as any)
+const PortalCarsIndexRoute = PortalCarsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalCarsRoute,
+} as any)
+const PortalBookingsIndexRoute = PortalBookingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalBookingsRoute,
+} as any)
+const PortalCustomersCustomerIdRoute =
+  PortalCustomersCustomerIdRouteImport.update({
+    id: '/$customerId',
+    path: '/$customerId',
+    getParentRoute: () => PortalCustomersRoute,
+  } as any)
+const PortalCarsCarIdRoute = PortalCarsCarIdRouteImport.update({
+  id: '/$carId',
+  path: '/$carId',
+  getParentRoute: () => PortalCarsRoute,
+} as any)
+const PortalBookingsOrderIdRoute = PortalBookingsOrderIdRouteImport.update({
+  id: '/$orderId',
+  path: '/$orderId',
+  getParentRoute: () => PortalBookingsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/portal': typeof PortalRouteWithChildren
   '/renter': typeof RenterRouteWithChildren
-  '/portal/bookings': typeof PortalBookingsRoute
-  '/portal/cars': typeof PortalCarsRoute
-  '/portal/customers': typeof PortalCustomersRoute
+  '/portal/bookings': typeof PortalBookingsRouteWithChildren
+  '/portal/cars': typeof PortalCarsRouteWithChildren
+  '/portal/customers': typeof PortalCustomersRouteWithChildren
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/settings': typeof PortalSettingsRoute
   '/renter/bookings': typeof RenterBookingsRoute
   '/renter/dashboard': typeof RenterDashboardRoute
+  '/renter/profile': typeof RenterProfileRoute
   '/cars/$carId': typeof CarsCarIdLazyRoute
+  '/portal/bookings/$orderId': typeof PortalBookingsOrderIdRoute
+  '/portal/cars/$carId': typeof PortalCarsCarIdRoute
+  '/portal/customers/$customerId': typeof PortalCustomersCustomerIdRoute
+  '/portal/bookings/': typeof PortalBookingsIndexRoute
+  '/portal/cars/': typeof PortalCarsIndexRoute
+  '/portal/customers/': typeof PortalCustomersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/portal': typeof PortalRouteWithChildren
   '/renter': typeof RenterRouteWithChildren
-  '/portal/bookings': typeof PortalBookingsRoute
-  '/portal/cars': typeof PortalCarsRoute
-  '/portal/customers': typeof PortalCustomersRoute
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/settings': typeof PortalSettingsRoute
   '/renter/bookings': typeof RenterBookingsRoute
   '/renter/dashboard': typeof RenterDashboardRoute
+  '/renter/profile': typeof RenterProfileRoute
   '/cars/$carId': typeof CarsCarIdLazyRoute
+  '/portal/bookings/$orderId': typeof PortalBookingsOrderIdRoute
+  '/portal/cars/$carId': typeof PortalCarsCarIdRoute
+  '/portal/customers/$customerId': typeof PortalCustomersCustomerIdRoute
+  '/portal/bookings': typeof PortalBookingsIndexRoute
+  '/portal/cars': typeof PortalCarsIndexRoute
+  '/portal/customers': typeof PortalCustomersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -112,13 +174,21 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/portal': typeof PortalRouteWithChildren
   '/renter': typeof RenterRouteWithChildren
-  '/portal/bookings': typeof PortalBookingsRoute
-  '/portal/cars': typeof PortalCarsRoute
-  '/portal/customers': typeof PortalCustomersRoute
+  '/portal/bookings': typeof PortalBookingsRouteWithChildren
+  '/portal/cars': typeof PortalCarsRouteWithChildren
+  '/portal/customers': typeof PortalCustomersRouteWithChildren
   '/portal/dashboard': typeof PortalDashboardRoute
+  '/portal/settings': typeof PortalSettingsRoute
   '/renter/bookings': typeof RenterBookingsRoute
   '/renter/dashboard': typeof RenterDashboardRoute
+  '/renter/profile': typeof RenterProfileRoute
   '/cars/$carId': typeof CarsCarIdLazyRoute
+  '/portal/bookings/$orderId': typeof PortalBookingsOrderIdRoute
+  '/portal/cars/$carId': typeof PortalCarsCarIdRoute
+  '/portal/customers/$customerId': typeof PortalCustomersCustomerIdRoute
+  '/portal/bookings/': typeof PortalBookingsIndexRoute
+  '/portal/cars/': typeof PortalCarsIndexRoute
+  '/portal/customers/': typeof PortalCustomersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,22 +201,35 @@ export interface FileRouteTypes {
     | '/portal/cars'
     | '/portal/customers'
     | '/portal/dashboard'
+    | '/portal/settings'
     | '/renter/bookings'
     | '/renter/dashboard'
+    | '/renter/profile'
     | '/cars/$carId'
+    | '/portal/bookings/$orderId'
+    | '/portal/cars/$carId'
+    | '/portal/customers/$customerId'
+    | '/portal/bookings/'
+    | '/portal/cars/'
+    | '/portal/customers/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/portal'
     | '/renter'
+    | '/portal/dashboard'
+    | '/portal/settings'
+    | '/renter/bookings'
+    | '/renter/dashboard'
+    | '/renter/profile'
+    | '/cars/$carId'
+    | '/portal/bookings/$orderId'
+    | '/portal/cars/$carId'
+    | '/portal/customers/$customerId'
     | '/portal/bookings'
     | '/portal/cars'
     | '/portal/customers'
-    | '/portal/dashboard'
-    | '/renter/bookings'
-    | '/renter/dashboard'
-    | '/cars/$carId'
   id:
     | '__root__'
     | '/'
@@ -157,9 +240,17 @@ export interface FileRouteTypes {
     | '/portal/cars'
     | '/portal/customers'
     | '/portal/dashboard'
+    | '/portal/settings'
     | '/renter/bookings'
     | '/renter/dashboard'
+    | '/renter/profile'
     | '/cars/$carId'
+    | '/portal/bookings/$orderId'
+    | '/portal/cars/$carId'
+    | '/portal/customers/$customerId'
+    | '/portal/bookings/'
+    | '/portal/cars/'
+    | '/portal/customers/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -207,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CarsCarIdLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/renter/profile': {
+      id: '/renter/profile'
+      path: '/profile'
+      fullPath: '/renter/profile'
+      preLoaderRoute: typeof RenterProfileRouteImport
+      parentRoute: typeof RenterRoute
+    }
     '/renter/dashboard': {
       id: '/renter/dashboard'
       path: '/dashboard'
@@ -220,6 +318,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/renter/bookings'
       preLoaderRoute: typeof RenterBookingsRouteImport
       parentRoute: typeof RenterRoute
+    }
+    '/portal/settings': {
+      id: '/portal/settings'
+      path: '/settings'
+      fullPath: '/portal/settings'
+      preLoaderRoute: typeof PortalSettingsRouteImport
+      parentRoute: typeof PortalRoute
     }
     '/portal/dashboard': {
       id: '/portal/dashboard'
@@ -249,21 +354,107 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalBookingsRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/customers/': {
+      id: '/portal/customers/'
+      path: '/'
+      fullPath: '/portal/customers/'
+      preLoaderRoute: typeof PortalCustomersIndexRouteImport
+      parentRoute: typeof PortalCustomersRoute
+    }
+    '/portal/cars/': {
+      id: '/portal/cars/'
+      path: '/'
+      fullPath: '/portal/cars/'
+      preLoaderRoute: typeof PortalCarsIndexRouteImport
+      parentRoute: typeof PortalCarsRoute
+    }
+    '/portal/bookings/': {
+      id: '/portal/bookings/'
+      path: '/'
+      fullPath: '/portal/bookings/'
+      preLoaderRoute: typeof PortalBookingsIndexRouteImport
+      parentRoute: typeof PortalBookingsRoute
+    }
+    '/portal/customers/$customerId': {
+      id: '/portal/customers/$customerId'
+      path: '/$customerId'
+      fullPath: '/portal/customers/$customerId'
+      preLoaderRoute: typeof PortalCustomersCustomerIdRouteImport
+      parentRoute: typeof PortalCustomersRoute
+    }
+    '/portal/cars/$carId': {
+      id: '/portal/cars/$carId'
+      path: '/$carId'
+      fullPath: '/portal/cars/$carId'
+      preLoaderRoute: typeof PortalCarsCarIdRouteImport
+      parentRoute: typeof PortalCarsRoute
+    }
+    '/portal/bookings/$orderId': {
+      id: '/portal/bookings/$orderId'
+      path: '/$orderId'
+      fullPath: '/portal/bookings/$orderId'
+      preLoaderRoute: typeof PortalBookingsOrderIdRouteImport
+      parentRoute: typeof PortalBookingsRoute
+    }
   }
 }
 
+interface PortalBookingsRouteChildren {
+  PortalBookingsOrderIdRoute: typeof PortalBookingsOrderIdRoute
+  PortalBookingsIndexRoute: typeof PortalBookingsIndexRoute
+}
+
+const PortalBookingsRouteChildren: PortalBookingsRouteChildren = {
+  PortalBookingsOrderIdRoute: PortalBookingsOrderIdRoute,
+  PortalBookingsIndexRoute: PortalBookingsIndexRoute,
+}
+
+const PortalBookingsRouteWithChildren = PortalBookingsRoute._addFileChildren(
+  PortalBookingsRouteChildren,
+)
+
+interface PortalCarsRouteChildren {
+  PortalCarsCarIdRoute: typeof PortalCarsCarIdRoute
+  PortalCarsIndexRoute: typeof PortalCarsIndexRoute
+}
+
+const PortalCarsRouteChildren: PortalCarsRouteChildren = {
+  PortalCarsCarIdRoute: PortalCarsCarIdRoute,
+  PortalCarsIndexRoute: PortalCarsIndexRoute,
+}
+
+const PortalCarsRouteWithChildren = PortalCarsRoute._addFileChildren(
+  PortalCarsRouteChildren,
+)
+
+interface PortalCustomersRouteChildren {
+  PortalCustomersCustomerIdRoute: typeof PortalCustomersCustomerIdRoute
+  PortalCustomersIndexRoute: typeof PortalCustomersIndexRoute
+}
+
+const PortalCustomersRouteChildren: PortalCustomersRouteChildren = {
+  PortalCustomersCustomerIdRoute: PortalCustomersCustomerIdRoute,
+  PortalCustomersIndexRoute: PortalCustomersIndexRoute,
+}
+
+const PortalCustomersRouteWithChildren = PortalCustomersRoute._addFileChildren(
+  PortalCustomersRouteChildren,
+)
+
 interface PortalRouteChildren {
-  PortalBookingsRoute: typeof PortalBookingsRoute
-  PortalCarsRoute: typeof PortalCarsRoute
-  PortalCustomersRoute: typeof PortalCustomersRoute
+  PortalBookingsRoute: typeof PortalBookingsRouteWithChildren
+  PortalCarsRoute: typeof PortalCarsRouteWithChildren
+  PortalCustomersRoute: typeof PortalCustomersRouteWithChildren
   PortalDashboardRoute: typeof PortalDashboardRoute
+  PortalSettingsRoute: typeof PortalSettingsRoute
 }
 
 const PortalRouteChildren: PortalRouteChildren = {
-  PortalBookingsRoute: PortalBookingsRoute,
-  PortalCarsRoute: PortalCarsRoute,
-  PortalCustomersRoute: PortalCustomersRoute,
+  PortalBookingsRoute: PortalBookingsRouteWithChildren,
+  PortalCarsRoute: PortalCarsRouteWithChildren,
+  PortalCustomersRoute: PortalCustomersRouteWithChildren,
   PortalDashboardRoute: PortalDashboardRoute,
+  PortalSettingsRoute: PortalSettingsRoute,
 }
 
 const PortalRouteWithChildren =
@@ -272,11 +463,13 @@ const PortalRouteWithChildren =
 interface RenterRouteChildren {
   RenterBookingsRoute: typeof RenterBookingsRoute
   RenterDashboardRoute: typeof RenterDashboardRoute
+  RenterProfileRoute: typeof RenterProfileRoute
 }
 
 const RenterRouteChildren: RenterRouteChildren = {
   RenterBookingsRoute: RenterBookingsRoute,
   RenterDashboardRoute: RenterDashboardRoute,
+  RenterProfileRoute: RenterProfileRoute,
 }
 
 const RenterRouteWithChildren =

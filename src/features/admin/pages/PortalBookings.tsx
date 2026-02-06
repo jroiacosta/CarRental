@@ -1,5 +1,6 @@
-import { Search, Filter, MoreHorizontal, CheckCircle2, XCircle, Clock, AlertCircle, Calendar as CalendarIcon, Download } from "lucide-react";
+import { Search, Filter, CheckCircle2, XCircle, Clock, AlertCircle, Calendar as CalendarIcon, Download } from "lucide-react";
 import { cn } from "../../../common/utils";
+import { Link } from "@tanstack/react-router";
 
 const bookings = [
     {
@@ -144,9 +145,15 @@ export const PortalBookings = () => {
                                         <span className="text-sm font-bold text-slate-900 dark:text-white">${booking.amount.toLocaleString()}</span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <button className="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded">
-                                            <MoreHorizontal size={18} />
-                                        </button>
+                                        <div className="flex justify-end gap-2">
+                                            <Link
+                                                to="/portal/bookings/$orderId"
+                                                params={{ orderId: booking.id }}
+                                                className="text-white hover:text-white transition-colors px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-700"
+                                            >
+                                                View Details
+                                            </Link>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

@@ -4,12 +4,10 @@ import {
     LogOut,
     History,
     User,
-    Settings,
     ChevronRight,
 } from "lucide-react";
 import { cn } from "../../../common/utils";
 import { auth } from "../../../common/auth";
-import { Header } from "../../landing/components/Header";
 
 export const RenterLayout = () => {
     const location = useLocation();
@@ -24,16 +22,13 @@ export const RenterLayout = () => {
         { icon: LayoutDashboard, label: "Dashboard", to: "/renter/dashboard" },
         { icon: History, label: "Orders / Bookings", to: "/renter/bookings" },
         { icon: User, label: "Account Details", to: "/renter/profile" },
-        { icon: Settings, label: "Settings", to: "/renter/settings" },
     ];
 
     return (
         <div className="min-h-screen bg-slate-950 font-body text-slate-100">
-            {/* Unified Public Header */}
-            <Header />
+            {/* Header Removed as per user request */}
 
-            {/* Spacer for Fixed Header */}
-            <div className="h-20" />
+            {/* Header Removed as per user request */}
 
             {/* Page Header (Clean Dark Mode Style) */}
             <div className="bg-slate-900 border-b border-white/5 relative overflow-hidden">

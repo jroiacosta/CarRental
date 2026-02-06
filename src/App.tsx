@@ -5,6 +5,8 @@ import type { FunctionComponent } from "./common/types";
 import type { TanstackRouter } from "./main";
 import { TanStackRouterDevelopmentTools } from "./components/utils/development-tools/TanStackRouterDevelopmentTools";
 
+import { Toaster } from "sonner";
+
 const queryClient = new QueryClient();
 
 type AppProps = { router: TanstackRouter };
@@ -19,6 +21,7 @@ const App = ({ router }: AppProps): FunctionComponent => {
 				router={router}
 			/>
 			<ReactQueryDevtools initialIsOpen={false} position="bottom" />
+			<Toaster position="top-center" theme="dark" richColors />
 		</QueryClientProvider>
 	);
 };

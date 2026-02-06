@@ -1,80 +1,60 @@
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../../common/utils";
-import { Calendar } from "./Calendar";
-
-import { Matcher } from "react-day-picker";
 
 interface DatePickerProps {
     date: Date | undefined;
     setDate: (date: Date | undefined) => void;
     label?: string;
     placeholder?: string;
-    disabled?: Matcher | Matcher[];
+    disabled?: { before?: Date } | any; // Loose type to accept the existing Matcher shape without importing it
 }
 
-export function DatePicker({ date, setDate, label, placeholder = "Pick a date", disabled }: DatePickerProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
-
-    // Close on click outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
+export function DatePicker({ date, setDate, label, disabled }: DatePickerProps) {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.value) {
+            // Create date from "YYYY-MM-DD" string in local time
+            const parts = e.target.value.split('-').map(Number);
+            if (parts.length === 3) {
+                const [year, month, day] = parts;
+                setDate(new Date(year!, month! - 1, day));
             }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
-
-    const handleSelect = (selectedDate: Date | undefined) => {
-        setDate(selectedDate);
-        setIsOpen(false);
+        } else {
+            setDate(undefined);
+        }
     };
 
+    // formatted value for input: YYYY-MM-DD
+    const inputValue = date ? format(date, "yyyy-MM-dd") : "";
+
+    // Calculate min date from disabled prop if it has 'before'
+    // The previous component used 'before' to disable all dates before a certain date.
+    // In native input, this corresponds to the 'min' attribute.
+    // We add 1 day because 'before: today' means today is valid, but 'before: today' physically implies < today.
+    // Actually, let's look at BookingForm: disabled={{ before: today }}. React Day Picker 'before' disables everything *before* that date.
+    // So 'min' should be that date.
+    // But wait, if disabled is { before: today }, it means today is enabled?
+    // In React Day Picker, { before: new Date() } disables dates before now.
+    // So 'min' attribute should be new Date().
+
+    let minDate: string | undefined;
+    if (disabled?.before) {
+        minDate = format(disabled.before, "yyyy-MM-dd");
+    }
+
     return (
-        <div className="relative" ref={containerRef}>
+        <div className="w-full">
             {label && <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">{label}</label>}
-
-            <button
-                type="button"
-                onClick={() => setIsOpen(!isOpen)}
+            <input
+                type="date"
+                value={inputValue}
+                onChange={handleChange}
+                min={minDate}
                 className={cn(
-                    "w-full flex items-center justify-between bg-slate-950 border border-white/10 rounded-lg p-3 text-left font-normal transition-colors hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500/50",
-                    !date && "text-slate-500"
+                    "w-full bg-slate-950 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-red-500/50 transition-colors uppercase",
+                    !date && "text-slate-500" // Placeholder style if supported
                 )}
-            >
-                <span className={cn("text-sm", !date && "text-slate-500")}>
-                    {date ? format(date, "PPP") : <span>{placeholder}</span>}
-                </span>
-                <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
-            </button>
-
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full mt-2 left-0 z-[9999] w-auto bg-slate-900 border border-white/10 rounded-xl shadow-2xl p-2"
-                    >
-                        <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={handleSelect}
-                            disabled={disabled}
-                            initialFocus
-                            captionLayout="dropdown"
-                            fromYear={new Date().getFullYear()}
-                            toYear={new Date().getFullYear() + 10}
-                        />
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                style={{ colorScheme: 'dark' }} // Forces browser native picker to be dark mode
+            />
         </div>
     );
 }

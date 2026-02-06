@@ -5,7 +5,22 @@ import { FeaturedCars } from "../components/FeaturedCars";
 import { ContactSection } from "../components/ContactSection";
 
 
+import { useEffect } from "react";
+
 const LandingPage = () => {
+    useEffect(() => {
+        const hash = window.location.hash;
+        if (!hash) return;
+
+        const timeoutId = setTimeout(() => {
+            const element = document.querySelector(hash);
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
+            }
+        }, 100);
+        return () => clearTimeout(timeoutId);
+    }, []);
+
     return (
         <div className="min-h-screen bg-slate-950 font-body">
             <Header />

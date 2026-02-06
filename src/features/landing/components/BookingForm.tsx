@@ -79,10 +79,14 @@ export const BookingForm = ({ carName }: { carName: string }) => {
                     </div>
                 </div>
 
-                <div>
+                <div className="space-y-4">
                     <FileDropzone
                         label="Upload Driver's License"
-                        onFileSelect={(file) => console.log(file)}
+                        onFileSelect={(file) => console.log('License:', file)}
+                    />
+                    <FileDropzone
+                        label="Upload Insurance"
+                        onFileSelect={(file) => console.log('Insurance:', file)}
                     />
                 </div>
 

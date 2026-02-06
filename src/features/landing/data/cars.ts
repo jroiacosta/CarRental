@@ -64,7 +64,7 @@ export const CARS = [
         tagline: "Raise Your Limits",
         gallery: [
             "https://images.unsplash.com/photo-1621135802920-133df287f89c?q=80&w=1600&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1544605956-027581be442d?q=80&w=1600&auto=format&fit=crop"
+            "https://www.netcarshow.com/McLaren-720S_Spider_by_MSO-2019-1280-d7cc40c05c4bd5bfec26dff79024806919.jpg?token=ec59994be11a4092ace34c6f311e96840c26cd03ce86600d6c252b0",
         ],
         description: "Lighter, stronger, faster. The 720S is a masterpiece of light and aerodynamic design, delivering blistering performance with incredible driver engagement.",
         features: ["Carbon Fiber Monocage II", "Proactive Chassis Control II", "Variable Drift Control", "Dihedral Doors"]

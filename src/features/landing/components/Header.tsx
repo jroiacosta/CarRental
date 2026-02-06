@@ -2,11 +2,13 @@ import { APP_CONFIG } from "../../../config/constants";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useNavigate, useLocation, Link } from "@tanstack/react-router";
 import { auth } from "../../../common/auth";
 
 export const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const location = useLocation();
+    const navigate = useNavigate();
     const isAuthenticated = auth.isAuthenticated();
     const role = auth.getRole();
 
@@ -26,7 +28,15 @@ export const Header = () => {
     const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
         e.preventDefault();
         setIsOpen(false);
-        const element = document.querySelector(href);
+
+        const targetHash = href.replace('#', '');
+
+        if (location.pathname !== '/') {
+            navigate({ to: '/', hash: targetHash });
+            return;
+        }
+
+        const element = document.getElementById(targetHash);
         if (element) {
             element.scrollIntoView({ behavior: "smooth" });
         }

@@ -1,60 +1,78 @@
 import { format } from "date-fns";
+import { Calendar as CalendarIcon, X } from "lucide-react";
 import { cn } from "../../common/utils";
+import { Calendar } from "./Calendar";
+import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface DatePickerProps {
     date: Date | undefined;
     setDate: (date: Date | undefined) => void;
     label?: string;
     placeholder?: string;
-    disabled?: { before?: Date } | any; // Loose type to accept the existing Matcher shape without importing it
+    disabled?: any;
 }
 
-export function DatePicker({ date, setDate, label, disabled }: DatePickerProps) {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.value) {
-            // Create date from "YYYY-MM-DD" string in local time
-            const parts = e.target.value.split('-').map(Number);
-            if (parts.length === 3) {
-                const [year, month, day] = parts;
-                setDate(new Date(year!, month! - 1, day));
-            }
-        } else {
-            setDate(undefined);
-        }
-    };
-
-    // formatted value for input: YYYY-MM-DD
-    const inputValue = date ? format(date, "yyyy-MM-dd") : "";
-
-    // Calculate min date from disabled prop if it has 'before'
-    // The previous component used 'before' to disable all dates before a certain date.
-    // In native input, this corresponds to the 'min' attribute.
-    // We add 1 day because 'before: today' means today is valid, but 'before: today' physically implies < today.
-    // Actually, let's look at BookingForm: disabled={{ before: today }}. React Day Picker 'before' disables everything *before* that date.
-    // So 'min' should be that date.
-    // But wait, if disabled is { before: today }, it means today is enabled?
-    // In React Day Picker, { before: new Date() } disables dates before now.
-    // So 'min' attribute should be new Date().
-
-    let minDate: string | undefined;
-    if (disabled?.before) {
-        minDate = format(disabled.before, "yyyy-MM-dd");
-    }
-
+export function DatePicker({ date, setDate, label, placeholder = "Select date", disabled }: DatePickerProps) {
     return (
         <div className="w-full">
             {label && <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">{label}</label>}
-            <input
-                type="date"
-                value={inputValue}
-                onChange={handleChange}
-                min={minDate}
-                className={cn(
-                    "w-full bg-slate-950 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-red-500/50 transition-colors uppercase",
-                    !date && "text-slate-500" // Placeholder style if supported
+
+            <Popover className="relative">
+                {({ open, close }) => (
+                    <>
+                        <PopoverButton
+                            className={cn(
+                                "w-full flex items-center gap-3 bg-slate-950 border border-white/10 rounded-xl p-3 text-sm transition-all duration-300 outline-none text-left",
+                                open ? "border-red-500/50 ring-2 ring-red-500/10" : "hover:border-white/20",
+                                !date ? "text-slate-500" : "text-white font-medium"
+                            )}
+                        >
+                            <CalendarIcon size={16} className={cn("transition-colors", open ? "text-red-500" : "text-slate-500")} />
+                            <span className="flex-1 truncate">
+                                {date ? format(date, "PPP") : placeholder}
+                            </span>
+                            {date && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setDate(undefined);
+                                    }}
+                                    className="p-1 hover:bg-white/10 rounded-md transition-colors"
+                                >
+                                    <X size={14} className="text-slate-500 hover:text-white" />
+                                </button>
+                            )}
+                        </PopoverButton>
+
+                        <AnimatePresence>
+                            {open && (
+                                <PopoverPanel
+                                    static
+                                    as={motion.div}
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    transition={{ duration: 0.2, ease: "easeOut" }}
+                                    className="absolute z-[60] mt-3 left-0 sm:left-auto sm:right-0"
+                                >
+                                    <Calendar
+                                        mode="single"
+                                        selected={date}
+                                        onSelect={(newDate) => {
+                                            setDate(newDate);
+                                            if (newDate) close();
+                                        }}
+                                        disabled={disabled}
+                                        initialFocus
+                                    />
+                                </PopoverPanel>
+                            )}
+                        </AnimatePresence>
+                    </>
                 )}
-                style={{ colorScheme: 'dark' }} // Forces browser native picker to be dark mode
-            />
+            </Popover>
         </div>
     );
 }
+

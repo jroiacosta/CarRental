@@ -112,8 +112,8 @@ export const PortalBookings = () => {
         }
         if (statusFilter) list = list.filter((b) => b.status === statusFilter);
         if (carFilter) list = list.filter((b) => b.car === carFilter);
-        if (dateFrom) list = list.filter((b) => (b as { dateEndISO?: string }).dateEndISO >= dateFrom);
-        if (dateTo) list = list.filter((b) => (b as { dateStartISO?: string }).dateStartISO <= dateTo);
+        if (dateFrom) list = list.filter((b) => { const end = (b as { dateEndISO?: string }).dateEndISO; return end != null && end >= dateFrom; });
+        if (dateTo) list = list.filter((b) => { const start = (b as { dateStartISO?: string }).dateStartISO; return start != null && start <= dateTo; });
         return list;
     }, [search, statusFilter, carFilter, dateFrom, dateTo]);
 

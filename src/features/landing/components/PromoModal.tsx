@@ -13,10 +13,9 @@ export const PromoModal = () => {
     const imageSrc = promo.image && !imageError ? promo.image : FALLBACK_IMAGE;
 
     useEffect(() => {
-        if (promo.enabled) {
-            const timer = setTimeout(() => setIsOpen(true), 1500);
-            return () => clearTimeout(timer);
-        }
+        if (!promo.enabled) return undefined;
+        const timer = setTimeout(() => setIsOpen(true), 1500);
+        return () => clearTimeout(timer);
     }, [promo.enabled]);
 
     if (!promo.enabled) return null;

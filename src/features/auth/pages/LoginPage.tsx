@@ -91,8 +91,17 @@ const LoginPage = () => {
 
                     <div className="flex items-center gap-2 text-sm text-slate-500">
                         <div className="flex -space-x-2">
-                            {[1, 2, 3].map(i => (
-                                <div key={i} className="w-8 h-8 rounded-full border-2 border-slate-900 bg-slate-800" />
+                            {[
+                                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face",
+                                "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop&crop=face",
+                                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face",
+                            ].map((src, i) => (
+                                <img
+                                    key={i}
+                                    src={src}
+                                    alt=""
+                                    className="w-8 h-8 rounded-full border-2 border-slate-900 object-cover"
+                                />
                             ))}
                         </div>
                         <span>Trusted by 500+ Dealers</span>

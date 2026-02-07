@@ -12,9 +12,10 @@ import {
     X,
     Home,
     Moon,
-    Sun
+    Sun,
+    ChevronDown
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { cn } from "../../../common/utils";
 import { auth } from "../../../common/auth";
 import { useTheme } from "../../../common/useTheme";
@@ -48,9 +49,21 @@ const SidebarItem = ({
     );
 };
 
+const allSearchItems = [
+    { icon: LayoutDashboard, label: "Dashboard", to: "/portal/dashboard", keywords: "dashboard home" },
+    { icon: Car, label: "Cars Management", to: "/portal/cars", keywords: "cars fleet vehicles management" },
+    { icon: CalendarCheck, label: "Bookings", to: "/portal/bookings", keywords: "bookings reservations calendar orders" },
+    { icon: Users, label: "Customers", to: "/portal/customers", keywords: "customers users clients" },
+    { icon: Settings, label: "Settings", to: "/portal/settings", keywords: "settings system config" },
+];
+
 export const PortalLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchFocused, setSearchFocused] = useState(false);
+    const searchRef = useRef<HTMLDivElement>(null);
     const { theme, toggleTheme } = useTheme();
     const location = useLocation();
     const navigate = useNavigate();
@@ -93,6 +106,26 @@ export const PortalLayout = () => {
         { icon: CalendarCheck, label: "Bookings", to: "/portal/bookings" },
         { icon: Users, label: "Customers", to: "/portal/customers" },
     ];
+
+    const searchResults = useMemo(() => {
+        const q = searchQuery.trim().toLowerCase();
+        if (!q) return allSearchItems;
+        return allSearchItems.filter(
+            (item) =>
+                item.label.toLowerCase().includes(q) ||
+                item.keywords.toLowerCase().includes(q)
+        );
+    }, [searchQuery]);
+
+    const showSearchDropdown = searchFocused && (searchQuery.length > 0 || searchResults.length > 0);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(e.target as Node)) setSearchFocused(false);
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     return (
         <div className={cn(
@@ -139,7 +172,7 @@ export const PortalLayout = () => {
                                 <SidebarItem
                                     key={item.label}
                                     {...item}
-                                    isActive={location.pathname === item.to}
+                                    isActive={location.pathname === item.to || location.pathname.startsWith(item.to + "/")}
                                 />
                             ))}
                         </nav>
@@ -152,7 +185,7 @@ export const PortalLayout = () => {
                                 icon={Settings}
                                 label="Settings"
                                 to="/portal/settings"
-                                isActive={location.pathname === "/portal/settings"}
+                                isActive={location.pathname === "/portal/settings" || location.pathname.startsWith("/portal/settings/")}
                             />
                         </nav>
                     </div>
@@ -182,15 +215,46 @@ export const PortalLayout = () => {
                             <Menu size={20} />
                         </button>
 
-                        {/* Search */}
-                        <div className="hidden sm:flex items-center relative">
-                            <Search size={18} className="absolute left-3 text-slate-400" />
+                        {/* Search content / menu */}
+                        <div ref={searchRef} className="hidden sm:block relative w-64">
+                            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
                             <input
                                 type="text"
-                                placeholder="Search portal..."
-                                className="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-slate-500 w-64 placeholder:text-slate-500"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onFocus={() => setSearchFocused(true)}
+                                placeholder="Search menu... (e.g. bookings, cars)"
+                                className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border border-transparent rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-red-500 focus:border-red-500/50 outline-none placeholder:text-slate-500"
                             />
+                            {showSearchDropdown && (
+                                <div className="absolute left-0 right-0 top-full mt-1 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 max-h-72 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <p className="px-4 py-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                        Go to
+                                    </p>
+                                    {searchResults.length === 0 ? (
+                                        <p className="px-4 py-3 text-sm text-slate-500">No matches</p>
+                                    ) : (
+                                        searchResults.map((item) => (
+                                            <Link
+                                                key={item.to}
+                                                to={item.to}
+                                                onClick={() => { setSearchQuery(""); setSearchFocused(false); }}
+                                                className={cn(
+                                                    "flex items-center gap-3 px-4 py-2.5 text-sm transition-colors",
+                                                    location.pathname === item.to || location.pathname.startsWith(item.to + "/")
+                                                        ? "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 font-semibold"
+                                                        : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                                )}
+                                            >
+                                                <item.icon size={18} className="shrink-0" />
+                                                {item.label}
+                                            </Link>
+                                        ))
+                                    )}
+                                </div>
+                            )}
                         </div>
+
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -283,14 +347,57 @@ export const PortalLayout = () => {
                             )}
                         </div>
 
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                                <img src="https://ui-avatars.com/api/?name=Papajroi&background=random" alt="Admin" />
-                            </div>
-                            <div className="hidden sm:block text-sm">
-                                <p className="font-semibold text-slate-900 dark:text-white">Papajroi</p>
-                                <p className="text-slate-500 dark:text-slate-400 text-xs">Portal Admin</p>
-                            </div>
+                        {/* Profile dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={() => { setShowProfileMenu((v) => !v); setShowNotifications(false); }}
+                                onBlur={() => setTimeout(() => setShowProfileMenu(false), 150)}
+                                className="flex items-center gap-3 rounded-lg p-1.5 pr-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                            >
+                                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden shrink-0">
+                                    <img src="https://ui-avatars.com/api/?name=Papajroi&background=random" alt="Admin" />
+                                </div>
+                                <div className="hidden sm:block text-left text-sm">
+                                    <p className="font-semibold text-slate-900 dark:text-white">Papajroi</p>
+                                    <p className="text-slate-500 dark:text-slate-400 text-xs">Portal Admin</p>
+                                </div>
+                                <ChevronDown size={16} className={cn("hidden sm:block text-slate-400 transition-transform", showProfileMenu && "rotate-180")} />
+                            </button>
+                            {showProfileMenu && (
+                                <>
+                                    <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} aria-hidden />
+                                    <div className="absolute right-0 top-full mt-2 w-56 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
+                                            <p className="font-semibold text-slate-900 dark:text-white">Papajroi</p>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">Portal Admin</p>
+                                        </div>
+                                        <Link
+                                            to="/portal/dashboard"
+                                            onClick={() => setShowProfileMenu(false)}
+                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                        >
+                                            <LayoutDashboard size={18} className="shrink-0" />
+                                            Dashboard
+                                        </Link>
+                                        <Link
+                                            to="/portal/settings"
+                                            onClick={() => setShowProfileMenu(false)}
+                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                        >
+                                            <Settings size={18} className="shrink-0" />
+                                            Settings
+                                        </Link>
+                                        <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+                                        <button
+                                            onClick={() => { setShowProfileMenu(false); handleLogout(); }}
+                                            className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                        >
+                                            <LogOut size={18} className="shrink-0" />
+                                            Logout
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </header>

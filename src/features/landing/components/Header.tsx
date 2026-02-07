@@ -1,12 +1,15 @@
 import { APP_CONFIG } from "../../../config/constants";
 import { motion } from "framer-motion";
-import { Menu, X, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { Menu, X, ArrowRight, User, LayoutDashboard, LogOut, ChevronDown } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "@tanstack/react-router";
 import { auth } from "../../../common/auth";
+import { cn } from "../../../common/utils";
 
 export const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+    const accountRef = useRef<HTMLDivElement>(null);
     const location = useLocation();
     const navigate = useNavigate();
     const isAuthenticated = auth.isAuthenticated();
@@ -36,6 +39,21 @@ export const Header = () => {
         const element = document.getElementById(targetHash);
         if (element) element.scrollIntoView({ behavior: "smooth" });
     };
+
+    const handleLogout = () => {
+        auth.logout();
+        setAccountMenuOpen(false);
+        setIsOpen(false);
+        navigate({ to: "/login" });
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (accountRef.current && !accountRef.current.contains(e.target as Node)) setAccountMenuOpen(false);
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     return (
         <motion.header
@@ -71,15 +89,43 @@ export const Header = () => {
                         ))}
                     </nav>
 
-                    {/* Desktop Right: Register (link + arrow) or My Account */}
+                    {/* Desktop Right: Register or My Account dropdown */}
                     <div className="hidden md:flex items-center shrink-0">
                         {isAuthenticated ? (
-                            <Link
-                                to={getDashboardLink()}
-                                className="text-white font-medium hover:text-red-400 transition-colors text-sm"
-                            >
-                                My Account
-                            </Link>
+                            <div ref={accountRef} className="relative">
+                                <button
+                                    onClick={() => setAccountMenuOpen((v) => !v)}
+                                    className={cn(
+                                        "flex items-center gap-2 text-white font-medium transition-colors text-sm rounded-lg px-3 py-2 hover:bg-white/10",
+                                        accountMenuOpen && "bg-white/10"
+                                    )}
+                                >
+                                    <User size={18} />
+                                    My Account
+                                    <ChevronDown size={14} className={cn("transition-transform", accountMenuOpen && "rotate-180")} />
+                                </button>
+                                {accountMenuOpen && (
+                                    <div className="absolute right-0 top-full mt-2 w-52 py-2 bg-slate-900 border border-white/10 rounded-xl shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <Link
+                                            to={getDashboardLink()}
+                                            onClick={() => setAccountMenuOpen(false)}
+                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
+                                        >
+                                            <LayoutDashboard size={18} className="shrink-0" />
+                                            {role === "admin" ? "Portal Dashboard" : "My Dashboard"}
+                                        </Link>
+                                        <div className="border-t border-white/10 my-1" />
+                                        <button
+                                            type="button"
+                                            onClick={handleLogout}
+                                            className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-white/5 transition-colors"
+                                        >
+                                            <LogOut size={18} className="shrink-0" />
+                                            Logout
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         ) : (
                             <Link
                                 to="/login"
@@ -128,9 +174,28 @@ export const Header = () => {
                         ))}
                         <hr className="border-white/10 my-3" />
                         {isAuthenticated ? (
-                            <Link to={getDashboardLink()} className="block py-3 text-white font-medium">
-                                My Account
-                            </Link>
+                            <>
+                                <div className="flex items-center gap-2 py-2 px-1 text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                                    <User size={14} />
+                                    My Account
+                                </div>
+                                <Link
+                                    to={getDashboardLink()}
+                                    onClick={() => setIsOpen(false)}
+                                    className="flex items-center gap-3 py-2.5 pl-4 text-slate-300 hover:text-white font-medium"
+                                >
+                                    <LayoutDashboard size={18} className="shrink-0" />
+                                    {role === "admin" ? "Portal Dashboard" : "My Dashboard"}
+                                </Link>
+                                <button
+                                    type="button"
+                                    onClick={() => { handleLogout(); }}
+                                    className="flex items-center gap-3 w-full py-2.5 pl-4 text-left text-red-400 hover:text-red-300 font-medium"
+                                >
+                                    <LogOut size={18} className="shrink-0" />
+                                    Logout
+                                </button>
+                            </>
                         ) : (
                             <Link to="/login" className="inline-flex items-center gap-1.5 py-3 text-white font-medium">
                                 Register

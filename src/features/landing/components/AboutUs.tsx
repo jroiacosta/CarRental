@@ -47,7 +47,7 @@ export const AboutUs = () => {
                         viewport={{ once: true }}
                         className="text-4xl md:text-6xl font-bold font-heading text-white mb-6"
                     >
-                        Driving Excellence Since 2010
+                        Driving Excellence Since 2025
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 10 }}

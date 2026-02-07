@@ -1,9 +1,27 @@
 import { motion, Variants } from "framer-motion";
-import { ArrowRight, ShieldCheck, Zap, Star, Play } from "lucide-react";
+import { ArrowRight, ShieldCheck, Zap, Star, Image as ImageIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { CARS } from "../data/cars";
+import { useState, useMemo } from "react";
+import { Lightbox } from "../../../components/ui/Lightbox";
+
+// Fleet cars shown in hero / fleet section (Economy & Full Size Van)
+const fleetCars = [CARS[2], CARS[3]].filter((c): c is (typeof CARS)[number] => !!c);
+
+/** Gallery images from the actual fleet cars (main + gallery for each) */
+function getFleetGalleryImages(): string[] {
+    const images: string[] = [];
+    fleetCars.forEach((car) => {
+        images.push(car.image);
+        if (car.gallery?.length) images.push(...car.gallery);
+    });
+    return images;
+}
 
 export const Hero = () => {
+    const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+    const fleetGalleryImages = useMemo(() => getFleetGalleryImages(), []);
+
     const scrollToFleet = (e: React.MouseEvent) => {
         e.preventDefault();
         document.getElementById("fleet")?.scrollIntoView({ behavior: "smooth" });
@@ -96,9 +114,12 @@ export const Hero = () => {
                                 Book Your Ride
                                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                             </button>
-                            <button className="w-full sm:w-auto py-4 px-10 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold transition-all flex items-center justify-center gap-3">
-                                <Play size={18} className="fill-white" />
-                                Watch Fleet Film
+                            <button
+                                onClick={() => setIsGalleryOpen(true)}
+                                className="w-full sm:w-auto py-4 px-10 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold transition-all flex items-center justify-center gap-3"
+                            >
+                                <ImageIcon size={18} />
+                                View Fleet Gallery
                             </button>
                         </motion.div>
 
@@ -206,6 +227,13 @@ export const Hero = () => {
                     <div className="w-px h-12 bg-gradient-to-b from-red-500 to-transparent" />
                 </motion.div>
             </div>
+
+            {isGalleryOpen && fleetGalleryImages.length > 0 && (
+                <Lightbox
+                    images={fleetGalleryImages}
+                    onClose={() => setIsGalleryOpen(false)}
+                />
+            )}
         </section>
     );
 };

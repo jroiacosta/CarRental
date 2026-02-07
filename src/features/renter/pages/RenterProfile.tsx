@@ -1,31 +1,64 @@
-import { useState } from "react";
-import { User, Mail, Phone, Lock, Save, ShieldCheck } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { User, Mail, Phone, Lock, Save, ShieldCheck, Camera, X } from "lucide-react";
 import { toast } from "sonner";
-import { FileDropzone } from "../../../components/ui/FileDropzone";
 import { TachometerLoader } from "../../../components/ui/CarLoader";
+
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024; // 2MB
+const ACCEPT_AVATAR = "image/jpeg,image/png,image/webp,image/gif";
 
 export const RenterProfile = () => {
     const [isSavingInfo, setIsSavingInfo] = useState(false);
     const [isSavingSecurity, setIsSavingSecurity] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Profile Info State
     const [avatar, setAvatar] = useState<File | null>(null);
+    const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
     const [firstName, setFirstName] = useState("John");
     const [lastName, setLastName] = useState("Doe");
     const [email, setEmail] = useState("john.doe@example.com");
     const [phone, setPhone] = useState("+1 (555) 123-4567");
+
+    useEffect(() => {
+        if (!avatar) {
+            if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
+            setAvatarPreviewUrl(null);
+            return;
+        }
+        const url = URL.createObjectURL(avatar);
+        setAvatarPreviewUrl(url);
+        return () => URL.revokeObjectURL(url);
+    }, [avatar]);
 
     // Security State
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
+    const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            toast.error("Please choose an image file (JPEG, PNG, WebP, or GIF).");
+            return;
+        }
+        if (file.size > MAX_AVATAR_SIZE) {
+            toast.error("Image must be under 2MB.");
+            return;
+        }
+        setAvatar(file);
+        e.target.value = "";
+    };
+
+    const removeAvatar = () => {
+        setAvatar(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
+
     const handleSaveInfo = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSavingInfo(true);
-        // Simulate API call
-        console.log("Saving avatar:", avatar); // Fix unused variable
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
         setIsSavingInfo(false);
         toast.success("Profile information updated successfully!");
     };
@@ -72,28 +105,70 @@ export const RenterProfile = () => {
 
             <div className="grid grid-cols-1 gap-8">
                 {/* Personal Information */}
-                <form onSubmit={handleSaveInfo} className="bg-slate-900/50 rounded-2xl border border-white/5 overflow-hidden flex flex-col h-full">
-                    <div className="p-6 border-b border-white/5 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
-                                <User size={20} />
+                <form onSubmit={handleSaveInfo} className="bg-slate-900/50 rounded-2xl border border-white/10 overflow-hidden flex flex-col">
+                    <div className="p-6 sm:p-8 border-b border-white/10">
+                        <div className="flex items-center gap-4">
+                            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20">
+                                <User size={24} className="text-red-400" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-white">Personal Information</h3>
-                                <p className="text-xs text-slate-500">Manage your personal details.</p>
+                                <h3 className="text-xl font-heading font-bold text-white">Personal Information</h3>
+                                <p className="text-sm text-slate-500 mt-0.5">Update your profile and photo.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="p-6 space-y-6 flex-1">
-                        {/* Avatar */}
-                        <div>
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Profile Photo</label>
-                            <FileDropzone
-                                onFileSelect={setAvatar}
-                                label=""
-                                maxSize={2 * 1024 * 1024}
-                            />
+                    <div className="p-6 sm:p-8 space-y-8">
+                        {/* Profile photo with preview */}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block sm:mb-0">Profile Photo</label>
+                            <div className="flex items-center gap-6">
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept={ACCEPT_AVATAR}
+                                    onChange={handleAvatarChange}
+                                    className="hidden"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="relative group shrink-0 w-28 h-28 rounded-full overflow-hidden border-2 border-dashed border-white/20 hover:border-red-500/50 bg-slate-950 flex items-center justify-center transition-colors"
+                                >
+                                    {avatarPreviewUrl ? (
+                                        <img
+                                            src={avatarPreviewUrl}
+                                            alt="Profile preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-1 text-slate-500 group-hover:text-slate-400 transition-colors">
+                                            <Camera size={28} />
+                                            <span className="text-[10px] font-bold uppercase tracking-wider">Upload</span>
+                                        </div>
+                                    )}
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <Camera size={24} className="text-white" />
+                                    </div>
+                                </button>
+                                <div className="flex flex-col gap-2">
+                                    {avatarPreviewUrl ? (
+                                        <>
+                                            <p className="text-sm text-slate-400">Preview ready. Save to update.</p>
+                                            <button
+                                                type="button"
+                                                onClick={removeAvatar}
+                                                className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-red-400 transition-colors"
+                                            >
+                                                <X size={14} />
+                                                Remove photo
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <p className="text-sm text-slate-500">JPG, PNG or WebP. Max 2MB.</p>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -103,7 +178,8 @@ export const RenterProfile = () => {
                                     type="text"
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
-                                    className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-red-500/50 transition-colors"
+                                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-red-500/50 transition-colors placeholder-slate-600"
+                                    placeholder="First name"
                                 />
                             </div>
                             <div>
@@ -112,7 +188,8 @@ export const RenterProfile = () => {
                                     type="text"
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
-                                    className="w-full bg-slate-950 border border-white/10 rounded-lg px-4 py-3 text-white text-sm outline-none focus:border-red-500/50 transition-colors"
+                                    className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-red-500/50 transition-colors placeholder-slate-600"
+                                    placeholder="Last name"
                                 />
                             </div>
                         </div>
@@ -120,12 +197,13 @@ export const RenterProfile = () => {
                         <div>
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Email Address</label>
                             <div className="relative">
-                                <Mail size={16} className="absolute left-3 top-3.5 text-slate-500" />
+                                <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                                 <input
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-slate-950 border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white text-sm outline-none focus:border-red-500/50 transition-colors"
+                                    className="w-full bg-slate-950 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white text-sm outline-none focus:border-red-500/50 transition-colors placeholder-slate-600"
+                                    placeholder="you@example.com"
                                 />
                             </div>
                         </div>
@@ -133,32 +211,33 @@ export const RenterProfile = () => {
                         <div>
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Phone Number</label>
                             <div className="relative">
-                                <Phone size={16} className="absolute left-3 top-3.5 text-slate-500" />
+                                <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
                                 <input
                                     type="tel"
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value)}
-                                    className="w-full bg-slate-950 border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white text-sm outline-none focus:border-red-500/50 transition-colors"
+                                    className="w-full bg-slate-950 border border-white/10 rounded-xl pl-11 pr-4 py-3 text-white text-sm outline-none focus:border-red-500/50 transition-colors placeholder-slate-600"
+                                    placeholder="+1 (555) 000-0000"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="p-6 border-t border-white/5 bg-white/5">
+                    <div className="p-6 sm:p-8 border-t border-white/10 bg-slate-950/30">
                         <button
                             type="submit"
                             disabled={isSavingInfo}
-                            className="w-full sm:w-auto ml-auto flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg shadow-blue-900/20 disabled:opacity-50"
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-sm transition-colors shadow-lg shadow-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isSavingInfo ? (
                                 <>
                                     <TachometerLoader size={18} />
-                                    <span>Updating Info...</span>
+                                    Updating...
                                 </>
                             ) : (
                                 <>
                                     <Save size={18} />
-                                    <span>Save Information</span>
+                                    Save Information
                                 </>
                             )}
                         </button>

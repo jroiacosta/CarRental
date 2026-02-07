@@ -5,16 +5,17 @@ export const CARS = [
         tagline: "Track-Ready Performance",
         category: "Supercar",
         price: 1200,
-        image: "https://pictures.porsche.com/rtt/iris?COSY-EU-100-1711coMvsi60AAt5FwcmBEgA4qP8iBUDxPE3Cb9pNXkBuNYdMGF4tl3U0%25z8rMHIspbWvanYb%255y%25oq%25vSTmjMXD4qAZeoNBPUSfUx4RmHlCgI7Zl2dioCxkF%25vUqCNwuWXsOw3meV6iTCj%25zhRc2GRdqAZ%25oD21P%25S1BAXmenugTfeIJpV7nDhQT",
+        image: "https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?w=1200&auto=format&fit=crop&q=80",
         gradient: "from-blue-600 to-purple-600",
         stats: { speed: "199 mph", accel: "2.7s", power: "518 hp" },
         transmission: "7-Speed PDK",
         rating: 5.0,
         totalReviews: 24,
         gallery: [
-            "https://images.unsplash.com/photo-1503376763036-066120622c74?q=80&w=1600&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1614162692292-0ac56d79753c?q=80&w=1600&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1597687210386-a08b89d05664?q=80&w=1600&auto=format&fit=crop"
+            "https://images.unsplash.com/photo-1614200179396-2bdb77ebf81b?w=1200&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=1200&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=1200&auto=format&fit=crop&q=80"
         ],
         description: "The 911 GT3 RS delivers pure motorsport technology for the street. With its high-revving naturally aspirated engine and motorsport-derived aerodynamics, it offers an unfiltered driving experience.",
         features: ["Carbon Fiber Hood", "DRS Wing", "Track Precision App", "Ceramic Composite Brakes"],

@@ -50,7 +50,7 @@ export const RenterLayout = () => {
                     <aside className="w-full lg:w-64 flex-shrink-0">
                         <nav className="space-y-1">
                             {sidebarItems.map((item) => {
-                                const isActive = location.pathname === item.to;
+                                const isActive = location.pathname === item.to || location.pathname.startsWith(item.to + "/");
                                 return (
                                     <Link
                                         key={item.label}

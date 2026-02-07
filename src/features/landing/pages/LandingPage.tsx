@@ -4,6 +4,7 @@ import { Hero } from "../components/Hero";
 import { FeaturedCars } from "../components/FeaturedCars";
 import { ContactSection } from "../components/ContactSection";
 import { PromoModal } from "../components/PromoModal";
+import { AboutUs } from "../components/AboutUs";
 
 
 import { useEffect } from "react";
@@ -27,6 +28,7 @@ const LandingPage = () => {
             <Header />
             <Hero />
             <FeaturedCars />
+            <AboutUs />
             <ContactSection />
             <PromoModal />
 

@@ -71,7 +71,7 @@ export const CARS = [
     {
         id: "mercedes-amg-gt",
         name: "Mercedes-AMG GT",
-        category: "Grand Tourer",
+        category: "Economy / Compact",
         price: 350,
         image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1600&auto=format&fit=crop",
         stats: { speed: "195 mph", accel: "3.1s", power: "577 hp" },
@@ -153,7 +153,7 @@ export const CARS = [
     {
         id: "mclaren-720s",
         name: "McLaren 720S",
-        category: "Hypercar",
+        category: "Full Size Van",
         price: 650,
         image: "https://images.unsplash.com/photo-1621135802920-133df287f89c?q=80&w=1600&auto=format&fit=crop",
         stats: { speed: "212 mph", accel: "2.8s", power: "710 hp" },

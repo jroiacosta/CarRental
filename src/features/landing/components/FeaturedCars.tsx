@@ -1,12 +1,12 @@
-import { APP_CONFIG } from "../../../config/constants";
 import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
-import { Fuel, Gauge, Zap, ArrowRight, Star, CheckCircle2, ShieldCheck, Car as CarIcon, Users } from "lucide-react";
-import { MouseEvent } from "react";
+import { Fuel, Gauge, Zap, Star } from "lucide-react";
+import { MouseEvent, useState, useMemo } from "react";
 
 import { CARS } from "../data/cars";
 import { Link } from "@tanstack/react-router";
 
-const cars = [CARS[2], CARS[3]].filter((c): c is typeof CARS[0] => !!c);
+const fleetCars = [CARS[2], CARS[3]].filter((c): c is typeof CARS[0] => !!c);
+const CATEGORIES = ["ALL", ...Array.from(new Set(fleetCars.map((c) => c.category)))];
 
 function Card({ car, index }: { car: typeof CARS[0]; index: number }) {
     const mouseX = useMotionValue(0);
@@ -105,143 +105,47 @@ function Card({ car, index }: { car: typeof CARS[0]; index: number }) {
     );
 }
 
-function InfoSection() {
-    return (
-        <div id="details" className="mt-32 border-t border-white/10 pt-24">
-            <div className="text-center mb-16">
-                <span className="text-red-500 font-bold tracking-widest uppercase text-xs mb-2 block">About Us</span>
-                <h2 className="text-3xl md:text-5xl font-bold font-heading text-white mb-6">
-                    {APP_CONFIG.COMPANY_NAME}
-                </h2>
-                <p className="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">
-                    We Move You to the Next Level! A trusted car rental service proudly serving {APP_CONFIG.CONTACT.ADDRESS.FULL}.
-                    We provide reliable, comfortable, and affordable vehicles to keep you moving with confidence.
-                </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-                {/* Economy Card */}
-                <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-8 hover:border-red-500/30 transition-colors">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 bg-red-500/10 rounded-xl text-red-500">
-                            <CarIcon size={32} />
-                        </div>
-                        <div>
-                            <h3 className="text-2xl font-bold text-white">Economy / Compact</h3>
-                            <p className="text-slate-400 text-sm">Ideal for city driving & everyday travel</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-6">
-                        <div>
-                            <h4 className="flex items-center gap-2 text-white font-semibold mb-3">
-                                <CheckCircle2 size={16} className="text-red-500" /> Features
-                            </h4>
-                            <p className="text-slate-400 ml-6 text-sm">Toyota Corolla, Honda Civic • 4-5 Passengers</p>
-                        </div>
-
-                        <div>
-                            <h4 className="flex items-center gap-2 text-white font-semibold mb-3">
-                                <CheckCircle2 size={16} className="text-red-500" /> Rates
-                            </h4>
-                            <ul className="ml-6 space-y-1 text-slate-400 text-sm">
-                                <li>Daily: <span className="text-white">$55–$65</span></li>
-                                <li>Weekly: <span className="text-white">$350–$400</span></li>
-                                <li>Monthly: <span className="text-white">$1,250–$1,400</span></li>
-                                <li>Security Deposit: $250</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Van Card */}
-                <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-8 hover:border-red-500/30 transition-colors">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 bg-red-500/10 rounded-xl text-red-500">
-                            <Users size={32} />
-                        </div>
-                        <div>
-                            <h3 className="text-2xl font-bold text-white">Full-Size Van</h3>
-                            <p className="text-slate-400 text-sm">Perfect for group travel, tours & events</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-6">
-                        <div>
-                            <h4 className="flex items-center gap-2 text-white font-semibold mb-3">
-                                <CheckCircle2 size={16} className="text-red-500" /> Features
-                            </h4>
-                            <p className="text-slate-400 ml-6 text-sm">Mercedes-Benz Sprinter (2025) • Up to 12 Passengers</p>
-                        </div>
-
-                        <div>
-                            <h4 className="flex items-center gap-2 text-white font-semibold mb-3">
-                                <CheckCircle2 size={16} className="text-red-500" /> Mileage Policy
-                            </h4>
-                            <ul className="ml-6 space-y-1 text-slate-400 text-sm">
-                                <li>150 miles / day</li>
-                                <li>1,000 miles / week</li>
-                                <li>3,000 miles / month</li>
-                                <li>Additional: $0.30/mile</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Bottom Details */}
-            <div className="mt-12 bg-white/5 rounded-2xl p-8 max-w-5xl mx-auto border border-white/5">
-                <h4 className="flex items-center gap-2 text-xl font-bold text-white mb-6">
-                    <ShieldCheck size={24} className="text-red-500" /> Rental Requirements
-                </h4>
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-slate-400 text-sm">
-                    <div className="flex items-center gap-3">
-                        <div className="h-1.5 w-1.5 bg-red-500 rounded-full" />
-                        Min. Age: 21 Years Old
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="h-1.5 w-1.5 bg-red-500 rounded-full" />
-                        Valid Driver’s License
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="h-1.5 w-1.5 bg-red-500 rounded-full" />
-                        Insurance Required
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <div className="h-1.5 w-1.5 bg-red-500 rounded-full" />
-                        No Smoking / Off-road
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-}
 
 export const FeaturedCars = () => {
+    const [selectedCategory, setSelectedCategory] = useState("ALL");
+    const filteredCars = useMemo(
+        () =>
+            selectedCategory === "ALL"
+                ? fleetCars
+                : fleetCars.filter((c) => c.category === selectedCategory),
+        [selectedCategory]
+    );
+
     return (
         <section id="fleet" className="py-24 bg-slate-950 relative">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-                    <div>
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="h-1 w-12 bg-red-600 rounded-full" />
-                            <span className="text-red-500 font-bold tracking-wider uppercase text-xs">Our Fleet</span>
-                        </div>
-                        <h2 className="text-3xl md:text-5xl font-bold font-heading text-white mb-4">
-                            Premium Selection
-                        </h2>
-                        <p className="text-slate-400 max-w-xl text-lg">
-                            Explore our hand-picked collection of the world's finest vehicles, available for your immediate enjoyment.
-                        </p>
-                    </div>
-                    <button className="hidden md:flex items-center gap-2 text-white border border-white/10 px-6 py-3 rounded-full hover:bg-white/5 transition-all group backdrop-blur-sm">
-                        View All Cars <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform text-red-500" />
-                    </button>
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-10">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-heading text-white">
+                        Our Vehicle Fleet
+                    </h2>
+                    <p className="text-slate-400 text-lg max-w-xl">
+                        We provide our customers with reliable, comfortable rides. That’s why we keep our fleet to two clear choices: economy/compact and full-size van.
+                    </p>
                 </div>
 
-                {/* Cars Grid - Centered for 2 items */}
+                {/* Category filters */}
+                <div className="flex flex-wrap gap-2 mb-12">
+                    {CATEGORIES.map((cat) => (
+                        <button
+                            key={cat}
+                            onClick={() => setSelectedCategory(cat)}
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold uppercase tracking-wider transition-colors ${selectedCategory === cat
+                                ? "bg-white text-slate-950 border border-white"
+                                : "bg-transparent text-slate-400 border border-white/20 hover:border-white/40 hover:text-white"
+                                }`}
+                        >
+                            {cat}
+                        </button>
+                    ))}
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                    {cars.map((car, index) => (
+                    {filteredCars.map((car, index) => (
                         <Card key={car.id} car={car} index={index} />
                     ))}
                 </div>
@@ -252,8 +156,6 @@ export const FeaturedCars = () => {
                     </button>
                 </div>
 
-                {/* Company Info Section */}
-                <InfoSection />
 
             </div>
         </section>

@@ -115,9 +115,11 @@ export const PortalLayout = () => {
                 <div className="h-full flex flex-col">
                     {/* Logo */}
                     <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800">
-                        <div className="w-8 h-8 bg-slate-900 dark:bg-white rounded-lg flex items-center justify-center text-white dark:text-slate-900 font-bold text-lg mr-3">
-                            P
-                        </div>
+                        <img
+                            src="/images/logo.png"
+                            alt="Portal Logo"
+                            className="w-8 h-8 object-contain mr-3"
+                        />
                         <span className="font-heading font-bold text-xl text-slate-900 dark:text-white">Portal</span>
                         <button
                             className="ml-auto lg:hidden text-slate-400 hover:text-slate-600"

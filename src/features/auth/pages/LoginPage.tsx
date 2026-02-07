@@ -77,9 +77,11 @@ const LoginPage = () => {
                     transition={{ delay: 0.2 }}
                     className="relative z-10 p-12 text-white max-w-lg"
                 >
-                    <div className="w-16 h-16 bg-gradient-to-br from-red-600 to-red-500 rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-2xl shadow-red-500/20 mb-8 border border-white/10">
-                        C
-                    </div>
+                    <img
+                        src="/images/logo.png"
+                        alt="Brand Logo"
+                        className="w-16 h-16 object-contain mb-8"
+                    />
                     <h1 className="text-5xl font-bold font-heading mb-6 leading-tight text-white">
                         Manage Your Fleet <br /> with <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-300">Confidence</span>
                     </h1>

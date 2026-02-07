@@ -18,8 +18,11 @@ export function FileDropzone({
     onFileSelect,
     onFilesSelect,
     label = "Upload File",
-    accept = { 'image/*': [] },
-    maxSize = 5 * 1024 * 1024, // 5MB default
+    accept = {
+        'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.svg'],
+        'application/pdf': ['.pdf']
+    },
+    maxSize = 10 * 1024 * 1024, // 10MB default
     multiple = false,
     showPreview = true
 }: FileDropzoneProps) {
@@ -33,9 +36,12 @@ export function FileDropzone({
     // Cleanup previews to avoid memory leaks
     useEffect(() => {
         return () => {
-            previews.forEach(url => URL.revokeObjectURL(url));
+            // Only cleanup on unmount - specific removes are handled in removeFile
+            previews.forEach(url => {
+                if (url) URL.revokeObjectURL(url);
+            });
         };
-    }, [previews]);
+    }, []);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
@@ -54,19 +60,21 @@ export function FileDropzone({
                             const newFiles = [...files, ...acceptedFiles];
                             setFiles(newFiles);
 
-                            const newPreviews = acceptedFiles
-                                .filter(f => f.type.startsWith('image/'))
-                                .map(f => URL.createObjectURL(f));
+                            const newPreviews = acceptedFiles.map(f =>
+                                f.type.startsWith('image/') ? URL.createObjectURL(f) : ""
+                            );
 
                             setPreviews(prevPrevs => [...prevPrevs, ...newPreviews]);
                             onFilesSelect?.(newFiles);
                         } else {
                             const selectedFile = acceptedFiles[0];
                             if (selectedFile) {
+                                // Revoke old single preview if it exists
+                                if (previews[0]) URL.revokeObjectURL(previews[0]);
+
                                 setFiles([selectedFile]);
-                                if (selectedFile.type.startsWith('image/')) {
-                                    setPreviews([URL.createObjectURL(selectedFile)]);
-                                }
+                                const previewUrl = selectedFile.type.startsWith('image/') ? URL.createObjectURL(selectedFile) : "";
+                                setPreviews([previewUrl]);
                                 onFileSelect?.(selectedFile);
                             }
                         }
@@ -143,7 +151,7 @@ export function FileDropzone({
                                     {isDragActive ? "Drop files here" : multiple ? "Click to upload multiple files" : "Click to upload or drag and drop"}
                                 </p>
                                 <p className="text-xs text-slate-500">
-                                    SVG, PNG, JPG or GIF (max. 5MB)
+                                    PDF, PNG, JPG, or SVG (max. 10MB)
                                 </p>
                             </div>
                         </motion.div>
@@ -185,20 +193,25 @@ export function FileDropzone({
                                             <img src={previews[idx]} alt="Preview" className="w-full h-full object-cover" />
                                         </div>
                                     ) : (
-                                        <div className="aspect-square rounded-lg bg-slate-900 border border-slate-700 flex flex-col items-center justify-center p-2 text-center">
-                                            <File size={24} className="text-slate-400 mb-2" />
-                                            <p className="text-xs text-slate-300 font-medium truncate w-full">{file.name}</p>
+                                        <div className="aspect-square rounded-lg bg-slate-900/80 border border-white/10 flex flex-col items-center justify-center p-4 text-center group-hover/item:border-red-500/50 transition-colors">
+                                            <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center mb-3 shadow-inner">
+                                                <File size={24} className={cn("text-slate-400", file.type === 'application/pdf' && "text-red-400")} />
+                                            </div>
+                                            <p className="text-xs text-white font-bold truncate w-full mb-1">{file.name}</p>
+                                            <p className="text-[10px] text-slate-500 uppercase tracking-tighter">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                                         </div>
                                     )}
 
                                     <button
+                                        type="button"
                                         onClick={(e) => removeFile(e, idx)}
-                                        className="absolute -top-2 -right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg opacity-0 group-hover/item:opacity-100 transition-all hover:scale-110"
+                                        className="absolute top-1 right-1 p-1.5 bg-slate-900/90 hover:bg-red-500 border border-white/10 hover:border-red-500 text-slate-300 hover:text-white rounded-full shadow-lg transition-all hover:scale-110 z-10"
+                                        aria-label="Remove file"
                                     >
                                         <X size={12} />
                                     </button>
-                                    <div className="absolute top-1 left-1 bg-green-500 text-white rounded-full p-0.5 shadow-md pointer-events-none">
-                                        <CheckCircle size={10} />
+                                    <div className="absolute top-2 left-2 bg-green-500 text-white rounded-full p-1 shadow-lg pointer-events-none z-10 animate-in zoom-in duration-300">
+                                        <CheckCircle size={14} />
                                     </div>
                                 </motion.div>
                             ))}

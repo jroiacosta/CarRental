@@ -56,9 +56,11 @@ export const Header = () => {
                         onClick={(e) => scrollToSection(e, "#home")}
                         className="flex items-center gap-2"
                     >
-                        <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-red-500 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-red-500/30">
-                            F
-                        </div>
+                        <img
+                            src="/images/logo.png"
+                            alt="Logo"
+                            className="w-10 h-10 object-contain"
+                        />
                         <span className="font-heading font-bold text-2xl text-white tracking-tight">
                             {APP_CONFIG.BRAND_NAME}
                         </span>

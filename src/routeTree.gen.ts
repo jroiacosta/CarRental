@@ -30,8 +30,14 @@ import { Route as PortalCustomersCustomerIdRouteImport } from './routes/portal.c
 import { Route as PortalCarsCarIdRouteImport } from './routes/portal.cars.$carId'
 import { Route as PortalBookingsOrderIdRouteImport } from './routes/portal.bookings.$orderId'
 
+const CheckoutLazyRouteImport = createFileRoute('/checkout')()
 const CarsCarIdLazyRouteImport = createFileRoute('/cars/$carId')()
 
+const CheckoutLazyRoute = CheckoutLazyRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/checkout.lazy').then((d) => d.Route))
 const RenterRoute = RenterRouteImport.update({
   id: '/renter',
   path: '/renter',
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/portal': typeof PortalRouteWithChildren
   '/renter': typeof RenterRouteWithChildren
+  '/checkout': typeof CheckoutLazyRoute
   '/portal/bookings': typeof PortalBookingsRouteWithChildren
   '/portal/cars': typeof PortalCarsRouteWithChildren
   '/portal/customers': typeof PortalCustomersRouteWithChildren
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/portal': typeof PortalRouteWithChildren
   '/renter': typeof RenterRouteWithChildren
+  '/checkout': typeof CheckoutLazyRoute
   '/portal/dashboard': typeof PortalDashboardRoute
   '/portal/settings': typeof PortalSettingsRoute
   '/renter/bookings': typeof RenterBookingsRoute
@@ -174,6 +182,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/portal': typeof PortalRouteWithChildren
   '/renter': typeof RenterRouteWithChildren
+  '/checkout': typeof CheckoutLazyRoute
   '/portal/bookings': typeof PortalBookingsRouteWithChildren
   '/portal/cars': typeof PortalCarsRouteWithChildren
   '/portal/customers': typeof PortalCustomersRouteWithChildren
@@ -197,6 +206,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/portal'
     | '/renter'
+    | '/checkout'
     | '/portal/bookings'
     | '/portal/cars'
     | '/portal/customers'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/portal'
     | '/renter'
+    | '/checkout'
     | '/portal/dashboard'
     | '/portal/settings'
     | '/renter/bookings'
@@ -236,6 +247,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/portal'
     | '/renter'
+    | '/checkout'
     | '/portal/bookings'
     | '/portal/cars'
     | '/portal/customers'
@@ -258,11 +270,19 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PortalRoute: typeof PortalRouteWithChildren
   RenterRoute: typeof RenterRouteWithChildren
+  CheckoutLazyRoute: typeof CheckoutLazyRoute
   CarsCarIdLazyRoute: typeof CarsCarIdLazyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/renter': {
       id: '/renter'
       path: '/renter'
@@ -480,6 +500,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PortalRoute: PortalRouteWithChildren,
   RenterRoute: RenterRouteWithChildren,
+  CheckoutLazyRoute: CheckoutLazyRoute,
   CarsCarIdLazyRoute: CarsCarIdLazyRoute,
 }
 export const routeTree = rootRouteImport

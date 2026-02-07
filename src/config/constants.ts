@@ -1,7 +1,7 @@
 
 export const APP_CONFIG = {
     COMPANY_NAME: "Fortune Cruise LLC",
-    BRAND_NAME: "Fortune Cruise",
+    BRAND_NAME: "Fortune Cruise LLC",
     CONTACT: {
         EMAIL: "contact@fortunecruise.com",
         PHONE: "+1 (555) 123-4567",

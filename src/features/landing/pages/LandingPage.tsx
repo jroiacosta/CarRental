@@ -3,6 +3,7 @@ import { Header } from "../components/Header";
 import { Hero } from "../components/Hero";
 import { FeaturedCars } from "../components/FeaturedCars";
 import { ContactSection } from "../components/ContactSection";
+import { PromoModal } from "../components/PromoModal";
 
 
 import { useEffect } from "react";
@@ -27,6 +28,7 @@ const LandingPage = () => {
             <Hero />
             <FeaturedCars />
             <ContactSection />
+            <PromoModal />
 
             <footer className="bg-slate-950 text-slate-500 py-8 text-center border-t border-white/5 text-sm">
                 <div className="max-w-7xl mx-auto px-6">
